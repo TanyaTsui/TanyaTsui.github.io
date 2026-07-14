@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Notes — Tanya</title>
+<meta name="description" content="A working set of interactive tools for bio-based materials and LCA research.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F5F3ED;
+    --paper-line: #DED8C7;
+    --ink: #20281F;
+    --ink-soft: #5B6459;
+    --moss: #445F45;
+    --moss-deep: #2E4230;
+    --clay: #8C6239;
+    --wheat: #C9A96A;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ background: var(--paper); }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  /* faint contour-line texture, echoing the mapping work */
+  .contours{
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 420px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .contours svg{ width: 100%; height: 100%; }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 28px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header{
+    padding: 96px 0 56px;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--moss);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before{
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--moss);
+    display: inline-block;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(38px, 6vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+    color: var(--moss-deep);
+  }
+
+  .lede{
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  .section-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--paper-line);
+    padding-bottom: 14px;
+    margin: 0 0 28px;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px){
+    .grid{ grid-template-columns: 1fr; }
+    header{ padding: 64px 0 40px; }
+  }
+
+  .card{
+    position: relative;
+    background: #FBFAF6;
+    border: 1px solid var(--paper-line);
+    border-radius: 3px;
+    padding: 28px 26px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .card:hover{
+    transform: translateY(-3px);
+    border-color: var(--moss);
+    box-shadow: 0 10px 24px -14px rgba(32, 40, 31, 0.35);
+  }
+
+  .card:hover .arrow{ transform: translate(3px, -3px); }
+
+  .tag{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 14px;
+  }
+
+  .card h2{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 21px;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .card p{
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .card .foot{
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--moss-deep);
+  }
+
+  .arrow{
+    display: inline-block;
+    transition: transform 0.18s ease;
+  }
+
+  .card.empty{
+    background: transparent;
+    border-style: dashed;
+    align-items: flex-start;
+    justify-content: center;
+    color: var(--ink-soft);
+  }
+  .card.empty .tag{ color: var(--ink-soft); }
+  .card.empty h2{ font-size: 17px; color: var(--ink-soft); font-weight: 500; }
+  .card.empty p{ font-size: 13.5px; }
+
+  footer{
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--paper-line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="contours" aria-hidden="true">
+  <svg viewBox="0 0 900 420" preserveAspectRatio="xMidYMin slice">
+    <g fill="none" stroke="#2E4230" stroke-width="1">
+      <path opacity="0.10" d="M -20 60 C 150 20, 300 100, 460 55 S 780 10, 940 70"/>
+      <path opacity="0.08" d="M -20 110 C 130 70, 320 150, 480 105 S 760 55, 940 120"/>
+      <path opacity="0.07" d="M -20 160 C 160 125, 300 195, 500 150 S 800 105, 940 165"/>
+      <path opacity="0.06" d="M -20 210 C 140 180, 340 240, 520 195 S 780 155, 940 215"/>
+      <path opacity="0.05" d="M -20 258 C 170 228, 330 285, 540 245 S 790 205, 940 262"/>
+    </g>
+  </svg>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Research tools</p>
+    <h1>A working index of the<br>tools I build.</h1>
+    <p class="lede">Interactive companions to the environmental assessment and LCA work I do — mapping, modelling, and exploring bio-based materials one tool at a time.</p>
+  </header>
+
+  <p class="section-label">Tools · 2</p>
+
+  <div class="grid">
+
+    <a class="card" href="factory-siting/">
+      <div class="tag">Geospatial · LCA</div>
+      <h2>Factory Siting Explorer</h2>
+      <p>Click anywhere in Europe to site a 3D-printing facility, then set a feedstock travel-distance limit to see local material availability, climate, and indicative process impacts.</p>
+      <div class="foot">Open tool <span class="arrow">↗</span></div>
+    </a>
+
+    <a class="card" href="recipe-explorer/">
+      <div class="tag">LCA · Impact modelling</div>
+      <h2>Recipe Impact Explorer</h2>
+      <p>Adjust the panel recipe and see how the environmental burden and benefit profile shifts across all 16 EF v3.1 impact categories, normalised to person-year equivalents.</p>
+      <div class="foot">Open tool <span class="arrow">↗</span></div>
+    </a>
+
+    <div class="card empty">
+      <div class="tag">Next</div>
+      <h2>More on the way</h2>
+      <p>New tools get added here as they're built — this space is reserved for whatever comes next.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>Built with Brightway2.5, rasterio &amp; Chart.js</span>
+    <span>Updated July 2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
