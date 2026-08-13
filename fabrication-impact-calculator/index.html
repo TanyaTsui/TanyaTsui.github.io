@@ -123,13 +123,102 @@
     letter-spacing: 0.04em;
   }
 
+  /* ── Target output ──────────────────────────────────────────────────── */
+  #targetOutputRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--accent-soft);
+  }
+  #targetOutputRow label {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  .target-output-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #targetOutputInput {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    background: #fff;
+    color: var(--ink);
+    width: 90px;
+    text-align: right;
+  }
+  #targetOutputInput:focus { outline: none; border-color: var(--accent); }
+  .target-output-input-wrap .unit-suffix {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
   /* ── Process cards ──────────────────────────────────────────────────── */
   #processList {
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 0;
   }
+
+  /* ── Mass-flow connector between step cards ────────────────────────────── */
+  .flow-connector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px 8px 30px;
+    margin-left: 14px;
+    border-left: 2px dashed var(--line-strong);
+  }
+  .flow-connector .flow-arrow {
+    color: var(--line-strong);
+    font-size: 14px;
+  }
+  .flow-connector .flow-text {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+  .flow-connector .flow-text b {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .flow-connector .retention-field {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .flow-connector .retention-field label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .flow-connector .retention-field input {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    width: 56px;
+    text-align: right;
+  }
+  .flow-connector .retention-field input:focus { outline: none; border-color: var(--accent); }
+  .flow-connector .retention-field .pct-suffix { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft); }
 
   .process-card {
     border: 1px solid var(--line);
@@ -155,6 +244,25 @@
     padding: 2px 6px;
     flex-shrink: 0;
   }
+
+  .reorder-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+  .reorder-btns button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 9px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 2px;
+  }
+  .reorder-btns button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .reorder-btns button:disabled { opacity: 0.3; cursor: default; }
 
   .process-name-input {
     flex: 1;
@@ -323,6 +431,23 @@
     margin-top: 8px;
   }
 
+  .headline-card.total-card {
+    background: var(--ink);
+    border-color: var(--ink);
+    grid-column: 1 / -1;
+  }
+  .headline-card.total-card .hc-name { color: #C7CDC6; }
+  .headline-card.total-card .hc-value,
+  .headline-card.total-card .hc-unit { color: #fff; }
+
+  .last-step-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--line-strong);
+    padding: 6px 4px 2px 30px;
+    margin-left: 14px;
+  }
+
   /* ── Chart ──────────────────────────────────────────────────────────── */
   .chart-wrap { width: 100%; overflow-x: auto; }
   #chartSvg { display: block; }
@@ -367,6 +492,20 @@
     flex-shrink: 0;
   }
 
+  .error-box {
+    display: none;
+    border: 1px solid var(--danger);
+    background: #FCEFEC;
+    border-radius: 3px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #7A2E23;
+  }
+  .error-box strong { display: block; margin-bottom: 4px; }
+  .error-box ul { margin: 0; padding-left: 18px; }
+  .error-box li { margin: 2px 0; }
+
   .empty-state {
     padding: 40px 20px;
     text-align: center;
@@ -393,10 +532,11 @@
       <h1>Digital Fabrication LCA Calculator</h1>
     </div>
     <p class="header-desc">
-      Define one or more fabrication processes by their machine and energy
-      parameters. Impacts are computed from ecoinvent 3.12 unit burdens
-      (machine wear + electricity market, EF v3.1), across 30 European
-      electricity grids.
+      Build a chain of fabrication steps — mixing, printing, baking, and so on —
+      and set the material retained between each. Required throughput at every
+      step is calculated backward from your target output, so mass loss is
+      handled automatically. Impacts use ecoinvent 3.12 unit burdens (machine
+      wear + electricity market, EF v3.1), across 30 European electricity grids.
     </p>
   </div>
 </header>
@@ -404,10 +544,17 @@
 <main>
   <section class="panel" id="inputPanel">
     <div class="panel-head">
-      <h2>Processes</h2>
+      <h2>Recipe</h2>
+    </div>
+    <div id="targetOutputRow">
+      <label for="targetOutputInput">Target final output</label>
+      <div class="target-output-input-wrap">
+        <input type="number" id="targetOutputInput" step="any" min="0">
+        <span class="unit-suffix">kg</span>
+      </div>
     </div>
     <div id="processList"></div>
-    <button class="add-process-btn" id="addProcessBtn">+ Add process</button>
+    <button class="add-process-btn" id="addProcessBtn">+ Add step</button>
   </section>
 
   <section class="panel" id="resultsPanel">
@@ -419,6 +566,7 @@
       </div>
     </div>
     <div class="results-body">
+      <div id="errorBox" class="error-box"></div>
       <div id="headlineCards"></div>
       <div class="chart-wrap">
         <svg id="chartSvg"></svg>
@@ -453,89 +601,125 @@
   var ENERGY_COLOR = "#E0A63A";
 
   var FIELD_DEFS = [
-    { key: "kg_machine",           label: "Machine weight",  unit: "kg" },
-    { key: "power_kW",             label: "Power",           unit: "kW" },
-    { key: "process_time_hrs",     label: "Process time",    unit: "hrs" },
-    { key: "machine_lifetime_hrs", label: "Machine lifetime",unit: "hrs" },
-    { key: "kg_output",            label: "Output",          unit: "kg" }
+    { key: "kg_machine",           label: "Machine weight",   unit: "kg" },
+    { key: "power_kW",             label: "Power",            unit: "kW" },
+    { key: "rate_kg_per_hr",       label: "Rate",             unit: "kg/hr" },
+    { key: "machine_lifetime_hrs", label: "Machine lifetime", unit: "hrs" }
   ];
 
-  var DEFAULT_PROCESS = {
+  var DEFAULT_STEP = {
     kg_machine: 200,
     power_kW: 1.0,
-    process_time_hrs: 1.0,
+    rate_kg_per_hr: 1.0,
     machine_lifetime_hrs: 12000,
-    kg_output: 1.0,
-    location: "NL"
+    location: "NL",
+    retainedPct: 100
   };
 
   var state = {
     nextId: 1,
-    processes: [],
+    targetOutputKg: 1.0,
+    steps: [],
     selectedCategory: CATEGORIES[0]
   };
 
-  function newProcess() {
+  function newStep() {
     var id = state.nextId++;
-    var p = Object.assign({ id: id, name: "Process " + id }, DEFAULT_PROCESS);
-    return p;
-  }
-
-  // ── Impact calculation ──────────────────────────────────────────────────
-  function computeImpact(process, category) {
-    var kg_machine = process.kg_machine;
-    var power_kW = process.power_kW;
-    var process_time_hrs = process.process_time_hrs;
-    var machine_lifetime_hrs = process.machine_lifetime_hrs;
-    var kg_output = process.kg_output;
-    var location = process.location;
-
-    if (!(kg_output > 0) || !(process_time_hrs > 0) || !(machine_lifetime_hrs > 0)) {
-      return null;
-    }
-    if (!(kg_machine >= 0) || !(power_kW >= 0)) {
-      return null;
-    }
-
-    var machineBurden = MACHINE_WEAR[category];
-    var electricityBurden = ELECTRICITY[location] && ELECTRICITY[location][category];
-    if (!machineBurden || !electricityBurden) return null;
-
-    var machineWearAmount = kg_machine * (process_time_hrs / machine_lifetime_hrs) / kg_output;
-    var energyUseAmount = power_kW * process_time_hrs / kg_output;
-
-    var machineImpact = machineWearAmount * machineBurden.score;
-    var energyImpact = energyUseAmount * electricityBurden.score;
-
-    return {
-      machine: machineImpact,
-      energy: energyImpact,
-      total: machineImpact + energyImpact,
-      unit: machineBurden.unit
-    };
+    return Object.assign({ id: id, name: "Step " + id }, DEFAULT_STEP);
   }
 
   // ── Number formatting ───────────────────────────────────────────────────
   function formatNumber(x) {
+    if (x === null || x === undefined || isNaN(x)) return "—";
     if (x === 0) return "0";
     var abs = Math.abs(x);
-    if (abs < 0.001 || abs >= 100000) {
-      return x.toExponential(2);
-    }
+    if (abs < 0.001 || abs >= 100000) return x.toExponential(2);
     if (abs < 1) return x.toPrecision(2);
     if (abs < 100) return x.toPrecision(3);
     return x.toFixed(1);
   }
 
-  // ── Rendering: process cards ────────────────────────────────────────────
-  function renderProcessList() {
+  // ── Chain calculation ────────────────────────────────────────────────────
+  // Works backward from the target output through the step chain, applying
+  // each step's retention fraction, then computes machine-wear and energy-use
+  // impact for the required throughput at each step. Returns either a full
+  // per-step result set, or a list of validation errors.
+  function computeChain(category) {
+    var steps = state.steps;
+    var errors = [];
+
+    if (!(state.targetOutputKg > 0)) {
+      errors.push("Target final output must be greater than 0.");
+    }
+    steps.forEach(function (s, i) {
+      if (!(s.kg_machine >= 0)) errors.push('"' + s.name + '": machine weight must be \u2265 0.');
+      if (!(s.power_kW >= 0)) errors.push('"' + s.name + '": power must be \u2265 0.');
+      if (!(s.rate_kg_per_hr > 0)) errors.push('"' + s.name + '": rate must be greater than 0.');
+      if (!(s.machine_lifetime_hrs > 0)) errors.push('"' + s.name + '": machine lifetime must be greater than 0.');
+      var isLast = i === steps.length - 1;
+      if (!isLast && !(s.retainedPct > 0 && s.retainedPct <= 100)) {
+        errors.push('"' + s.name + '": material retained must be between 0 (exclusive) and 100.');
+      }
+    });
+
+    if (errors.length > 0) {
+      return { valid: false, errors: errors };
+    }
+
+    // ── Backward pass: required output at each step ───────────────────────
+    var requiredOutput = new Array(steps.length);
+    requiredOutput[steps.length - 1] = state.targetOutputKg;
+    for (var i = steps.length - 2; i >= 0; i--) {
+      requiredOutput[i] = requiredOutput[i + 1] / (steps[i].retainedPct / 100);
+    }
+
+    // ── Per-step impact ─────────────────────────────────────────────────────
+    var stepResults = steps.map(function (s, i) {
+      var processTimeHrs = requiredOutput[i] / s.rate_kg_per_hr;
+      var machineBurden = MACHINE_WEAR[category];
+      var electricityBurden = ELECTRICITY[s.location] && ELECTRICITY[s.location][category];
+
+      var machineWearAmount = s.kg_machine * (processTimeHrs / s.machine_lifetime_hrs);
+      var energyUseAmount = s.power_kW * processTimeHrs;
+
+      var machineImpact = machineBurden ? machineWearAmount * machineBurden.score : null;
+      var energyImpact = electricityBurden ? energyUseAmount * electricityBurden.score : null;
+
+      return {
+        step: s,
+        requiredOutputKg: requiredOutput[i],
+        processTimeHrs: processTimeHrs,
+        machine: machineImpact,
+        energy: energyImpact,
+        total: (machineImpact !== null && energyImpact !== null) ? machineImpact + energyImpact : null,
+        unit: machineBurden ? machineBurden.unit : null
+      };
+    });
+
+    var recipeTotal = stepResults.reduce(function (sum, r) {
+      return r.total !== null ? sum + r.total : sum;
+    }, 0);
+
+    return {
+      valid: true,
+      steps: stepResults,
+      requiredOutput: requiredOutput,
+      recipeTotal: recipeTotal,
+      unit: stepResults.length ? stepResults[0].unit : null
+    };
+  }
+
+  // ── Rendering: step cards ───────────────────────────────────────────────
+  function renderStepList() {
     var list = document.getElementById("processList");
     list.innerHTML = "";
 
-    state.processes.forEach(function (p, idx) {
+    state.steps.forEach(function (s, idx) {
+      var isLast = idx === state.steps.length - 1;
+
       var card = document.createElement("div");
       card.className = "process-card";
-      card.dataset.id = p.id;
+      card.dataset.id = s.id;
 
       var top = document.createElement("div");
       top.className = "process-card-top";
@@ -547,19 +731,37 @@
 
       var nameInput = document.createElement("input");
       nameInput.className = "process-name-input";
-      nameInput.value = p.name;
+      nameInput.value = s.name;
       nameInput.dataset.field = "name";
-      nameInput.setAttribute("aria-label", "Process name");
+      nameInput.setAttribute("aria-label", "Step name");
       top.appendChild(nameInput);
 
-      if (state.processes.length > 1) {
+      var reorderWrap = document.createElement("div");
+      reorderWrap.className = "reorder-btns";
+      var upBtn = document.createElement("button");
+      upBtn.type = "button";
+      upBtn.textContent = "\u25B2";
+      upBtn.title = "Move earlier";
+      upBtn.disabled = idx === 0;
+      upBtn.addEventListener("click", function () { moveStep(s.id, -1); });
+      var downBtn = document.createElement("button");
+      downBtn.type = "button";
+      downBtn.textContent = "\u25BC";
+      downBtn.title = "Move later";
+      downBtn.disabled = isLast;
+      downBtn.addEventListener("click", function () { moveStep(s.id, 1); });
+      reorderWrap.appendChild(upBtn);
+      reorderWrap.appendChild(downBtn);
+      top.appendChild(reorderWrap);
+
+      if (state.steps.length > 1) {
         var removeBtn = document.createElement("button");
         removeBtn.className = "remove-btn";
         removeBtn.innerHTML = "&#10005;";
-        removeBtn.title = "Remove process";
+        removeBtn.title = "Remove step";
         removeBtn.addEventListener("click", function () {
-          state.processes = state.processes.filter(function (x) { return x.id !== p.id; });
-          renderProcessList();
+          state.steps = state.steps.filter(function (x) { return x.id !== s.id; });
+          renderStepList();
           renderResults();
         });
         top.appendChild(removeBtn);
@@ -573,23 +775,19 @@
       FIELD_DEFS.forEach(function (fd) {
         var field = document.createElement("div");
         field.className = "field";
-
         var label = document.createElement("label");
         label.innerHTML = fd.label + ' <span class="unit-suffix">(' + fd.unit + ")</span>";
         field.appendChild(label);
-
         var input = document.createElement("input");
         input.type = "number";
         input.step = "any";
         input.min = "0";
-        input.value = p[fd.key];
+        input.value = s[fd.key];
         input.dataset.field = fd.key;
         field.appendChild(input);
-
         grid.appendChild(field);
       });
 
-      // Location dropdown, spans full width
       var locField = document.createElement("div");
       locField.className = "field span-2";
       var locLabel = document.createElement("label");
@@ -601,24 +799,82 @@
         var opt = document.createElement("option");
         opt.value = loc;
         opt.textContent = loc;
-        if (loc === p.location) opt.selected = true;
+        if (loc === s.location) opt.selected = true;
         locSelect.appendChild(opt);
       });
       locField.appendChild(locSelect);
       grid.appendChild(locField);
 
       card.appendChild(grid);
+
+      var derivedInfo = document.createElement("div");
+      derivedInfo.className = "last-step-note step-derived-info";
+      derivedInfo.style.marginLeft = "0";
+      derivedInfo.style.paddingLeft = "4px";
+      card.appendChild(derivedInfo);
+
       list.appendChild(card);
 
-      // ── Event delegation for this card's inputs ──────────────────────────
+      // ── Connector to next step (retention field), or end-of-chain note ────
+      if (!isLast) {
+        var connector = document.createElement("div");
+        connector.className = "flow-connector";
+        connector.dataset.afterId = s.id;
+
+        var arrow = document.createElement("span");
+        arrow.className = "flow-arrow";
+        arrow.textContent = "\u2193";
+        connector.appendChild(arrow);
+
+        var flowText = document.createElement("span");
+        flowText.className = "flow-text";
+        connector.appendChild(flowText);
+
+        var retentionField = document.createElement("div");
+        retentionField.className = "retention-field";
+        var retLabel = document.createElement("label");
+        retLabel.textContent = "Retained after this step";
+        retentionField.appendChild(retLabel);
+        var retInput = document.createElement("input");
+        retInput.type = "number";
+        retInput.step = "any";
+        retInput.min = "0";
+        retInput.max = "100";
+        retInput.value = s.retainedPct;
+        retInput.dataset.field = "retainedPct";
+        retInput.dataset.stepId = s.id;
+        retentionField.appendChild(retInput);
+        var pctSuffix = document.createElement("span");
+        pctSuffix.className = "pct-suffix";
+        pctSuffix.textContent = "%";
+        retentionField.appendChild(pctSuffix);
+        connector.appendChild(retentionField);
+
+        list.appendChild(connector);
+
+        retInput.addEventListener("input", function (e) {
+          var proc = state.steps.find(function (x) { return x.id === s.id; });
+          var val = parseFloat(e.target.value);
+          proc.retainedPct = val;
+          e.target.classList.toggle("invalid", isNaN(val) || val <= 0 || val > 100);
+          renderResults();
+        });
+      } else {
+        var endNote = document.createElement("div");
+        endNote.className = "last-step-note";
+        endNote.textContent = "Final step — produces the target output directly.";
+        list.appendChild(endNote);
+      }
+
+      // ── Event delegation for this card's own inputs ──────────────────────
       card.addEventListener("input", function (e) {
         var field = e.target.dataset.field;
         if (!field) return;
-        var proc = state.processes.find(function (x) { return x.id === p.id; });
+        var proc = state.steps.find(function (x) { return x.id === s.id; });
         if (!proc) return;
 
         if (field === "name") {
-          proc.name = e.target.value || ("Process " + proc.id);
+          proc.name = e.target.value || ("Step " + proc.id);
         } else if (field === "location") {
           proc.location = e.target.value;
         } else {
@@ -629,6 +885,17 @@
         renderResults();
       });
     });
+  }
+
+  function moveStep(id, direction) {
+    var idx = state.steps.findIndex(function (x) { return x.id === id; });
+    var newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= state.steps.length) return;
+    var tmp = state.steps[idx];
+    state.steps[idx] = state.steps[newIdx];
+    state.steps[newIdx] = tmp;
+    renderStepList();
+    renderResults();
   }
 
   // ── Rendering: category dropdown ────────────────────────────────────────
@@ -648,47 +915,99 @@
   }
 
   // ── Rendering: headline cards ───────────────────────────────────────────
-  function renderHeadlineCards(results) {
+  function renderHeadlineCards(chain) {
     var wrap = document.getElementById("headlineCards");
     wrap.innerHTML = "";
 
-    results.forEach(function (r) {
+    if (!chain.valid) return;
+
+    var totalCard = document.createElement("div");
+    totalCard.className = "headline-card total-card";
+    totalCard.innerHTML =
+      '<p class="hc-name">Recipe total (' + state.targetOutputKg + " kg output)</p>" +
+      '<div><span class="hc-value">' + formatNumber(chain.recipeTotal) + "</span>" +
+      '<span class="hc-unit">' + (chain.unit || "") + "</span></div>";
+    wrap.appendChild(totalCard);
+
+    chain.steps.forEach(function (r) {
       var card = document.createElement("div");
       card.className = "headline-card";
-
       var name = document.createElement("p");
       name.className = "hc-name";
-      name.textContent = r.process.name;
+      name.textContent = r.step.name;
       card.appendChild(name);
 
       var valueWrap = document.createElement("div");
-      if (r.impact) {
+      if (r.total !== null) {
         valueWrap.innerHTML =
-          '<span class="hc-value">' + formatNumber(r.impact.total) + "</span>" +
-          '<span class="hc-unit">' + r.impact.unit + " / kg output</span>";
+          '<span class="hc-value">' + formatNumber(r.total) + "</span>" +
+          '<span class="hc-unit">' + r.unit + "</span>";
       } else {
-        valueWrap.innerHTML = '<span class="hc-value" style="color:var(--danger); font-size:13px;">Check inputs</span>';
+        valueWrap.innerHTML = '<span class="hc-value" style="color:var(--danger); font-size:13px;">No data</span>';
       }
       card.appendChild(valueWrap);
 
-      if (r.impact && r.impact.total !== 0) {
+      if (r.total) {
         var split = document.createElement("div");
         split.className = "hc-split";
-        var machinePct = Math.max(0, Math.min(100, (r.impact.machine / r.impact.total) * 100));
+        var machinePct = Math.max(0, Math.min(100, (r.machine / r.total) * 100));
         split.innerHTML =
           '<div style="width:' + machinePct + '%; background:' + MACHINE_COLOR + ';"></div>' +
           '<div style="width:' + (100 - machinePct) + '%; background:' + ENERGY_COLOR + ';"></div>';
         card.appendChild(split);
       }
-
       wrap.appendChild(card);
     });
   }
 
-  // ── Rendering: stacked bar chart (SVG) ──────────────────────────────────
-  function renderChart(results) {
+  // ── Rendering: derived info text on cards + connectors ──────────────────
+  function renderDerivedInfo(chain) {
+    if (!chain.valid) {
+      state.steps.forEach(function (s) {
+        var card = document.querySelector('.process-card[data-id="' + s.id + '"]');
+        if (card) card.querySelector(".step-derived-info").textContent = "";
+      });
+      document.querySelectorAll(".flow-connector .flow-text").forEach(function (el) {
+        el.innerHTML = "";
+      });
+      return;
+    }
+
+    chain.steps.forEach(function (r, i) {
+      var card = document.querySelector('.process-card[data-id="' + r.step.id + '"]');
+      if (card) {
+        card.querySelector(".step-derived-info").textContent =
+          "Required output: " + formatNumber(r.requiredOutputKg) + " kg  ·  Process time: " + formatNumber(r.processTimeHrs) + " hrs";
+      }
+      if (i < chain.steps.length - 1) {
+        var connector = document.querySelector('.flow-connector[data-after-id="' + r.step.id + '"]');
+        if (connector) {
+          var forwarded = r.requiredOutputKg * (r.step.retainedPct / 100);
+          connector.querySelector(".flow-text").innerHTML = "<b>" + formatNumber(forwarded) + " kg</b> carries forward";
+        }
+      }
+    });
+  }
+
+  // ── Rendering: stacked bar chart (SVG), one bar per step ─────────────────
+  function renderChart(chain) {
     var svg = document.getElementById("chartSvg");
-    var validResults = results.filter(function (r) { return r.impact !== null; });
+    var errorBox = document.getElementById("errorBox");
+
+    if (!chain.valid) {
+      svg.innerHTML = "";
+      svg.setAttribute("width", 0);
+      svg.setAttribute("height", 0);
+      if (errorBox) {
+        errorBox.innerHTML = "<strong>Check the recipe inputs:</strong><ul>" +
+          chain.errors.map(function (e) { return "<li>" + e + "</li>"; }).join("") + "</ul>";
+        errorBox.style.display = "block";
+      }
+      return;
+    }
+    if (errorBox) errorBox.style.display = "none";
+
+    var validResults = chain.steps.filter(function (r) { return r.total !== null; });
 
     var rowHeight = 40;
     var chartHeight = Math.max(80, validResults.length * rowHeight + 50);
@@ -709,30 +1028,24 @@
       text.setAttribute("y", chartHeight / 2);
       text.setAttribute("text-anchor", "middle");
       text.setAttribute("class", "bar-label");
-      text.textContent = "No valid processes to display — check inputs above.";
+      text.textContent = "No valid steps to display.";
       svg.appendChild(text);
       return;
     }
 
-    var maxTotal = Math.max.apply(null, validResults.map(function (r) { return r.impact.total; }));
+    var maxTotal = Math.max.apply(null, validResults.map(function (r) { return r.total; }));
     if (maxTotal <= 0) maxTotal = 1;
 
-    function xScale(v) {
-      return labelColWidth + (v / maxTotal) * plotWidth;
-    }
+    function xScale(v) { return labelColWidth + (v / maxTotal) * plotWidth; }
 
     var ns = "http://www.w3.org/2000/svg";
-
-    // Gridlines (4 ticks)
     var tickCount = 4;
     for (var t = 0; t <= tickCount; t++) {
       var val = (maxTotal / tickCount) * t;
       var x = xScale(val);
       var line = document.createElementNS(ns, "line");
-      line.setAttribute("x1", x);
-      line.setAttribute("x2", x);
-      line.setAttribute("y1", 10);
-      line.setAttribute("y2", chartHeight - 30);
+      line.setAttribute("x1", x); line.setAttribute("x2", x);
+      line.setAttribute("y1", 10); line.setAttribute("y2", chartHeight - 30);
       line.setAttribute("class", "gridline");
       svg.appendChild(line);
 
@@ -745,16 +1058,11 @@
       svg.appendChild(tickLabel);
     }
 
-    // Bars
     validResults.forEach(function (r, i) {
       var y = 20 + i * rowHeight;
       var barH = rowHeight - 14;
-
-      var machineW = (r.impact.machine / maxTotal) * plotWidth;
-      var energyW = (r.impact.energy / maxTotal) * plotWidth;
-      // Guard against negative widths (shouldn't happen, but formulas could yield edge cases)
-      machineW = Math.max(0, machineW);
-      energyW = Math.max(0, energyW);
+      var machineW = Math.max(0, (r.machine / maxTotal) * plotWidth);
+      var energyW = Math.max(0, (r.energy / maxTotal) * plotWidth);
 
       var machineRect = document.createElementNS(ns, "rect");
       machineRect.setAttribute("x", labelColWidth);
@@ -777,53 +1085,56 @@
       label.setAttribute("y", y + barH / 2 + 4);
       label.setAttribute("text-anchor", "end");
       label.setAttribute("class", "bar-label");
-      label.textContent = r.process.name;
+      label.textContent = r.step.name;
       svg.appendChild(label);
 
       var valueLabel = document.createElementNS(ns, "text");
       valueLabel.setAttribute("x", labelColWidth + machineW + energyW + 8);
       valueLabel.setAttribute("y", y + barH / 2 + 4);
       valueLabel.setAttribute("class", "bar-value-label");
-      valueLabel.textContent = formatNumber(r.impact.total);
+      valueLabel.textContent = formatNumber(r.total);
       svg.appendChild(valueLabel);
     });
 
-    // Axis line
     var axis = document.createElementNS(ns, "line");
-    axis.setAttribute("x1", labelColWidth);
-    axis.setAttribute("x2", labelColWidth);
-    axis.setAttribute("y1", 10);
-    axis.setAttribute("y2", chartHeight - 30);
+    axis.setAttribute("x1", labelColWidth); axis.setAttribute("x2", labelColWidth);
+    axis.setAttribute("y1", 10); axis.setAttribute("y2", chartHeight - 30);
     axis.setAttribute("class", "axis-line");
     svg.appendChild(axis);
   }
 
   // ── Master render ────────────────────────────────────────────────────────
   function renderResults() {
-    var category = state.selectedCategory;
-    var results = state.processes.map(function (p) {
-      return { process: p, impact: computeImpact(p, category) };
-    });
-    renderHeadlineCards(results);
-    renderChart(results);
+    var chain = computeChain(state.selectedCategory);
+    renderHeadlineCards(chain);
+    renderDerivedInfo(chain);
+    renderChart(chain);
   }
 
   // ── Init ─────────────────────────────────────────────────────────────────
   function init() {
-    state.processes.push(newProcess());
+    state.steps.push(newStep());
     renderCategorySelect();
-    renderProcessList();
+    renderStepList();
+
+    var targetInput = document.getElementById("targetOutputInput");
+    targetInput.value = state.targetOutputKg;
+    targetInput.addEventListener("input", function (e) {
+      var val = parseFloat(e.target.value);
+      state.targetOutputKg = val;
+      e.target.classList.toggle("invalid", isNaN(val) || val <= 0);
+      renderResults();
+    });
+
     renderResults();
 
     document.getElementById("addProcessBtn").addEventListener("click", function () {
-      state.processes.push(newProcess());
-      renderProcessList();
+      state.steps.push(newStep());
+      renderStepList();
       renderResults();
     });
 
-    window.addEventListener("resize", function () {
-      renderResults();
-    });
+    window.addEventListener("resize", function () { renderResults(); });
   }
 
   document.addEventListener("DOMContentLoaded", init);
