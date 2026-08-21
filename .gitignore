@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor/IDE
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependency directories (if you ever add build tooling)
+node_modules/
+
+# Environment variables (if you ever add API keys, etc.)
+.env
+.env.local
+
+# Temporary/backup files
+*.tmp
+*.bak
+*~
