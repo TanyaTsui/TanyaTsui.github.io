@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Field Notes — Tanya</title>
+<title>Tanya Tsui</title>
 <meta name="description" content="A working set of interactive tools for bio-based materials and LCA research.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper: #F5F3ED;
-    --paper-line: #DED8C7;
-    --ink: #20281F;
-    --ink-soft: #5B6459;
-    --moss: #445F45;
-    --moss-deep: #2E4230;
-    --clay: #8C6239;
-    --wheat: #C9A96A;
+    --paper: #F6F5F0;
+    --line: #BAC7B7;
+    --line-soft: #D7E0D5;
+    --blue-ink: #2E452F;
+    --blue-mid: #5C7A5C;
+    --text: #1E241C;
+    --text-soft: #5E6B5C;
+    --rust: #B5573A;
+    --card: #FFFFFF;
   }
 
   *{ box-sizing: border-box; }
@@ -27,99 +28,152 @@
   body{
     margin: 0;
     background: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
     -webkit-font-smoothing: antialiased;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
-  /* faint contour-line texture, echoing the mapping work */
-  .contours{
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 420px;
-    overflow: hidden;
+  .grid-bg{
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line-soft) 0.5px, transparent 0.5px),
+      linear-gradient(90deg, var(--line-soft) 0.5px, transparent 0.5px);
+    background-size: 32px 32px;
+    opacity: 0.55;
     pointer-events: none;
     z-index: 0;
   }
-  .contours svg{ width: 100%; height: 100%; }
 
   .wrap{
     max-width: 880px;
     margin: 0 auto;
-    padding: 0 28px 100px;
+    padding: 56px 28px 100px;
     position: relative;
     z-index: 1;
   }
 
-  header{
-    padding: 96px 0 56px;
+  .ticks{
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--blue-mid);
+    letter-spacing: 0.06em;
+    margin-bottom: 40px;
   }
 
-  .eyebrow{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--moss);
-    margin: 0 0 18px;
+  header{
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 26px;
+    margin-bottom: 35px;
   }
-  .eyebrow::before{
-    content: "";
-    width: 22px;
-    height: 1px;
-    background: var(--moss);
-    display: inline-block;
+
+  .portrait-icon{
+    width: 111px;
+    height: 111px;
+    border-radius: 0;
+    object-fit: cover;
+    background: var(--card);
+    border: 1.5px solid var(--blue-ink);
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .portrait-wrap{
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .header-text{
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
   }
 
   h1{
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(38px, 6vw, 56px);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(35px, 6vw, 48px);
     line-height: 1.05;
     letter-spacing: -0.01em;
-    margin: 0 0 20px;
-    color: var(--moss-deep);
+    margin: 0;
+    color: var(--blue-ink);
   }
 
-  .lede{
-    font-size: 17px;
-    color: var(--ink-soft);
-    max-width: 46ch;
+  .slogan{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue-mid);
     margin: 0;
+  }
+
+  .socials{
+    display: flex;
+    gap: 18px;
+    margin-top: 2px;
+  }
+
+  .socials a{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-soft);
+    text-decoration: none;
+    border-bottom: 0.5px solid var(--line);
+    padding-bottom: 1px;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+
+  .socials a:hover{
+    color: var(--rust);
+    border-color: var(--rust);
+  }
+
+  @media (max-width: 700px){
+    header{
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+    .portrait-icon{
+      width: 77px;
+      height: 77px;
+    }
   }
 
   .section-label{
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
+    font-size: 11.5px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--ink-soft);
-    border-bottom: 1px solid var(--paper-line);
-    padding-bottom: 14px;
-    margin: 0 0 28px;
+    color: var(--blue-mid);
+    border-bottom: 0.5px solid var(--line);
+    padding-bottom: 12px;
+    margin: 36px 0 22px;
+    display: flex;
+    justify-content: space-between;
   }
 
   .grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 18px;
   }
 
   @media (max-width: 700px){
     .grid{ grid-template-columns: 1fr; }
-    header{ padding: 64px 0 40px; }
   }
 
   .card{
     position: relative;
-    background: #FBFAF6;
-    border: 1px solid var(--paper-line);
-    border-radius: 3px;
-    padding: 28px 26px 24px;
+    background: var(--card);
+    border: 0.5px solid var(--line);
+    border-radius: 0;
+    padding: 26px 24px 22px;
     text-decoration: none;
     color: inherit;
     display: flex;
@@ -128,34 +182,45 @@
     transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
   }
 
+  .card::before{
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--rust);
+    border-radius: 50%;
+  }
+
   .card:hover{
     transform: translateY(-3px);
-    border-color: var(--moss);
-    box-shadow: 0 10px 24px -14px rgba(32, 40, 31, 0.35);
+    border-color: var(--blue-mid);
+    box-shadow: 0 10px 24px -16px rgba(30, 58, 95, 0.4);
   }
 
   .card:hover .arrow{ transform: translate(3px, -3px); }
 
   .tag{
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--clay);
-    margin-bottom: 14px;
+    color: var(--rust);
+    margin: 0 0 14px 16px;
   }
 
   .card h2{
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 21px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 19px;
     margin: 0 0 10px;
-    color: var(--ink);
+    color: var(--blue-ink);
   }
 
   .card p{
-    font-size: 14.5px;
-    color: var(--ink-soft);
+    font-size: 14px;
+    color: var(--text-soft);
     margin: 0;
     flex-grow: 1;
   }
@@ -167,7 +232,7 @@
     gap: 6px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
-    color: var(--moss-deep);
+    color: var(--blue-mid);
   }
 
   .arrow{
@@ -180,19 +245,43 @@
     border-style: dashed;
     align-items: flex-start;
     justify-content: center;
-    color: var(--ink-soft);
+    color: var(--text-soft);
   }
-  .card.empty .tag{ color: var(--ink-soft); }
-  .card.empty h2{ font-size: 17px; color: var(--ink-soft); font-weight: 500; }
-  .card.empty p{ font-size: 13.5px; }
+  .card.empty::before{ border-color: var(--line); }
+  .card.empty .tag{ color: var(--text-soft); }
+  .card.empty h2{ font-size: 16px; color: var(--text-soft); font-weight: 500; }
+  .card.empty p{ font-size: 13px; }
+
+  /* --- Intro / about section --- */
+  .intro{
+    padding: 0 0 8px;
+  }
+
+  .intro-text p{
+    font-size: 15px;
+    color: var(--text-soft);
+    margin: 0 0 16px;
+  }
+
+  .intro-text p:last-child{ margin-bottom: 0; }
+
+  .intro-text a{
+    color: var(--blue-ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rust);
+  }
+
+  .intro-text a:hover{
+    color: var(--rust);
+  }
 
   footer{
     margin-top: 72px;
     padding-top: 24px;
-    border-top: 1px solid var(--paper-line);
+    border-top: 0.5px solid var(--line);
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
+    font-size: 11.5px;
+    color: var(--text-soft);
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -202,27 +291,44 @@
 </head>
 <body>
 
-<div class="contours" aria-hidden="true">
-  <svg viewBox="0 0 900 420" preserveAspectRatio="xMidYMin slice">
-    <g fill="none" stroke="#2E4230" stroke-width="1">
-      <path opacity="0.10" d="M -20 60 C 150 20, 300 100, 460 55 S 780 10, 940 70"/>
-      <path opacity="0.08" d="M -20 110 C 130 70, 320 150, 480 105 S 760 55, 940 120"/>
-      <path opacity="0.07" d="M -20 160 C 160 125, 300 195, 500 150 S 800 105, 940 165"/>
-      <path opacity="0.06" d="M -20 210 C 140 180, 340 240, 520 195 S 780 155, 940 215"/>
-      <path opacity="0.05" d="M -20 258 C 170 228, 330 285, 540 245 S 790 205, 940 262"/>
-    </g>
-  </svg>
-</div>
+<div class="grid-bg" aria-hidden="true"></div>
 
 <div class="wrap">
 
+  <div class="ticks">
+    <span>N 52.1601</span>
+    <span>E 4.4970</span>
+    <span>SCALE 1:10000</span>
+  </div>
+
   <header>
-    <p class="eyebrow">Research tools</p>
-    <h1>A working index of the<br>tools I build.</h1>
-    <p class="lede">Interactive companions to the environmental assessment and LCA work I do — mapping, modelling, and exploring bio-based materials one tool at a time.</p>
+    <div class="portrait-wrap">
+      <img class="portrait-icon" src="avatar.png" alt="Illustrated portrait of Tanya Tsui">
+    </div>
+    <div class="header-text">
+      <h1>Tanya Tsui</h1>
+      <p class="slogan">Sustainability · Data · Cities</p>
+      <div class="socials">
+        <a href="https://scholar.google.com/citations?user=P-J4hyMAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
+        <a href="https://nl.linkedin.com/in/tanyatsui" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://medium.com/@tanyamarleytsui" target="_blank" rel="noopener">Medium</a>
+      </div>
+    </div>
   </header>
 
-  <p class="section-label">Tools</p>
+  <section class="intro">
+    <div class="intro-text">
+      <p>Hello! I'm Tanya, a postdoctoral researcher at <a href="https://www.universiteitleiden.nl/en/science/environmental-sciences/about_us" target="_blank" rel="noopener">Leiden University's Institute of Environmental Sciences (CML)</a>. I use spatial data science to help make cities more sustainable, with a focus on how we source and use building materials.</p>
+
+      <p>Most of my work looks at circular economy and bio-based materials in construction. This started during my <a href="https://journals.open.tudelft.nl/abe/article/view/7282" target="_blank" rel="noopener">PhD at TU Delft</a>, where I researched <a href="https://link.springer.com/article/10.1007/s43615-023-00285-y" target="_blank" rel="noopener">how circular hubs can be categorised and sited</a> to support urban manufacturing, and continued at <a href="https://senseable.mit.edu/" target="_blank" rel="noopener">MIT's Senseable City Lab</a>, where I <a href="https://bimzec.nl/" target="_blank" rel="noopener">mapped the logistics impacts</a> and <a href="https://senseable.mit.edu/timber-loops/" target="_blank" rel="noopener">optimized the scale</a> of circular hubs in Amsterdam. Right now, I'm working on the <a href="https://rawproject.eu/" target="_blank" rel="noopener">RAW project</a>, calculating the environmental impact of digitally fabricated bio-based construction products with LCA.</p>
+
+      <p>Alongside this research, I like building small spatial-data side projects for fun — like mapping <a href="https://medium.com/@tanyamarleytsui/shady-streets-6dad0979c13a" target="_blank" rel="noopener">the shortest shaded cycling route across Delft</a> one summer, or building <a href="https://medium.com/@tanyamarleytsui/making-a-lego-map-of-hong-kong-43b91dc9c7de" target="_blank" rel="noopener">a Lego map of Hong Kong</a> using open geo-data. I also occasionally write about the messier, more human side of academic life, including <a href="https://medium.com/@tanyamarleytsui/7-attitudes-to-survive-your-phd-e81c796ea0cd" target="_blank" rel="noopener">seven attitudes that got me through my PhD</a> and <a href="https://medium.com/@tanyamarleytsui/4-tools-that-made-my-phd-actually-enjoyable-c52640f92aa5" target="_blank" rel="noopener">the productivity tools that actually made it enjoyable</a>.</p>
+
+      <p>Below are some tools I've made — feel free to take a look!</p>
+    </div>
+  </section>
+
+  <p class="section-label"><span>Tools</span><span>05 items</span></p>
 
   <div class="grid">
 
@@ -271,7 +377,7 @@
 
   <footer>
     <span>Built with Brightway2.5, rasterio &amp; Chart.js</span>
-    <span>Updated July 2026</span>
+    <span>Updated August 2026</span>
   </footer>
 
 </div>
