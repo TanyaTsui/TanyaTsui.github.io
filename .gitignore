@@ -22,3 +22,6 @@ node_modules/
 *.tmp
 *.bak
 *~
+
+# Retired tools kept locally, not published
+_backup/
