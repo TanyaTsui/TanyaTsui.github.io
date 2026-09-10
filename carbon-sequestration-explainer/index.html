@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Sequestration Accounting in LCA — An Interactive Explainer</title>
+<meta name="description" content="An interactive explainer walking through four LCA methods for accounting for temporary carbon storage in bio-based building materials.">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tanyatsui.github.io/carbon-sequestration-explainer/">
+<meta property="og:title" content="Carbon Sequestration Accounting in LCA — An Interactive Explainer">
+<meta property="og:description" content="An interactive explainer walking through four LCA methods for accounting for temporary carbon storage in bio-based building materials.">
+<meta property="og:image" content="https://tanyatsui.github.io/avatar.png">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Carbon Sequestration Accounting in LCA — An Interactive Explainer">
+<meta name="twitter:description" content="An interactive explainer walking through four LCA methods for accounting for temporary carbon storage in bio-based building materials.">
+<meta name="twitter:image" content="https://tanyatsui.github.io/avatar.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1D9E75;--green-light:#E1F5EE;--green-dark:#085041;--green-mid:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#0C447C;
+  --coral:#D85A30;--coral-light:#FAECE7;--coral-dark:#993C1D;
+  --gray:#5F5E5A;
+  --bg-primary:#FFFFFF;--bg-secondary:#F4F3EE;--border-tertiary:#E5E3DB;--border-secondary:#D8D5C9;
+  --text-primary:#23211C;--text-secondary:#5F5E5A;--text-tertiary:#8C8A82;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  background:var(--bg-secondary);
+  color:var(--text-primary);
+  line-height:1.6;
+  padding:2rem 1rem;
+}
+.page{max-width:760px;margin:0 auto;background:var(--bg-primary);border-radius:16px;padding:1.75rem 1.75rem 1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.deck{padding:.25rem 0 1rem}
+.slide{display:none}.slide.active{display:block}
+.home-link{display:inline-block;font-size:11px;letter-spacing:.04em;color:var(--text-tertiary);text-decoration:none;margin-bottom:1rem}
+.home-link:hover{color:var(--green-dark)}
+.topnav{display:flex;align-items:center;gap:4px;margin-bottom:1.25rem;flex-wrap:wrap}
+.pip{width:22px;height:4px;border-radius:2px;background:var(--border-tertiary);cursor:pointer;flex-shrink:0;transition:background .18s;border:none}
+.pip.done{background:var(--green)}.pip.cur{background:var(--green);opacity:.5}
+.slide-lbl{font-size:11px;color:var(--text-secondary);margin-left:6px}
+.botnav{display:flex;gap:8px;margin-top:1.25rem;padding-top:.75rem;border-top:.5px solid var(--border-tertiary);align-items:center}
+.botnav button{padding:6px 16px;border:.5px solid var(--border-secondary);border-radius:8px;background:transparent;color:var(--text-primary);cursor:pointer;font-size:13px;font-family:inherit}
+.botnav button:hover{background:var(--bg-secondary)}
+.botnav button.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.botnav button.primary:hover{background:var(--green-dark)}
+.botnav .sp{flex:1}
+.menu-wrap{position:relative;margin-left:auto}
+.menu-btn{padding:4px 10px;border:.5px solid var(--border-secondary);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:11px;font-family:inherit;white-space:nowrap}
+.menu-btn:hover{background:var(--bg-secondary)}
+.menu-list{position:absolute;right:0;top:calc(100% + 4px);background:var(--bg-primary);border:.5px solid var(--border-secondary);border-radius:8px;padding:.3rem;min-width:200px;z-index:10;display:none;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.menu-list.open{display:block}
+.menu-item{display:flex;align-items:center;gap:6px;width:100%;padding:.3rem .5rem;border:none;background:transparent;text-align:left;font-size:12px;color:var(--text-secondary);border-radius:5px;cursor:pointer;font-family:inherit}
+.menu-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.menu-item.active{background:var(--green-light);color:var(--green-dark);font-weight:500}
+.menu-item .mn{font-size:10px;color:var(--text-tertiary);min-width:14px}
+.menu-item.active .mn{color:var(--green-mid)}
+h2{font-size:18px;font-weight:600;margin-bottom:.4rem}
+h3{font-size:14px;font-weight:600;margin-bottom:.3rem}
+p{font-size:13px;color:var(--text-secondary);margin-bottom:.5rem;line-height:1.5}
+.lead{font-size:14px;color:var(--text-primary);margin-bottom:.6rem;line-height:1.5}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem}
+.ref{font-size:10px;color:var(--text-tertiary);margin-top:.75rem;border-left:2px solid var(--border-tertiary);padding-left:.5rem;line-height:1.5}
+.callout{border-radius:8px;padding:.55rem .8rem;margin:.5rem 0;font-size:12px;line-height:1.5}
+.callout.green{background:var(--green-light);color:var(--green-dark)}
+.callout.amber{background:var(--amber-light);color:var(--amber-dark)}
+.callout.blue{background:var(--blue-light);color:var(--blue-mid)}
+.callout.coral{background:var(--coral-light);color:var(--coral-dark)}
+.mini-card{background:var(--bg-secondary);border-radius:8px;padding:.5rem .65rem;text-align:center}
+.mini-card .num{font-size:18px;font-weight:600}
+.mini-card .lbl{font-size:10px;color:var(--text-secondary);line-height:1.3}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.5rem 0}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.85rem}
+.timeline{display:flex;margin:.6rem 0}
+.tl-item{flex:1;text-align:center;padding:.45rem .3rem;position:relative}
+.tl-item:not(:last-child)::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:14px;z-index:1}
+.tl-item .icon{font-size:17px;margin-bottom:.15rem}
+.tl-item .label{font-size:11px;font-weight:600;color:var(--text-primary)}
+.tl-item .sub{font-size:10px;color:var(--text-secondary)}
+.formula-plain{background:var(--bg-secondary);border-radius:8px;padding:.6rem .9rem;margin:.5rem 0;font-size:13px;line-height:1.6}
+.formula-plain .fline{color:var(--text-primary);font-weight:600}
+.formula-plain .fcomment{font-size:11px;color:var(--text-secondary);margin-top:.2rem;line-height:1.5}
+.slider-row{display:flex;align-items:center;gap:8px;margin:.35rem 0}
+.slider-row label{font-size:11px;color:var(--text-secondary);min-width:110px;line-height:1.3}
+.slider-row input[type=range]{flex:1;min-width:0}
+.slider-row .val{font-size:11px;font-weight:600;min-width:38px;text-align:right}
+.dropdown-ctrl{flex:1;padding:4px 8px;border:.5px solid var(--border-secondary);border-radius:6px;background:var(--bg-secondary);color:var(--text-primary);font-family:inherit;font-size:12px}
+.cf-block{margin:.5rem 0}
+.cf-label{font-size:10px;color:var(--text-secondary);margin-bottom:.2rem}
+.cf-number{font-size:26px;font-weight:600;line-height:1}
+.cf-interp{font-size:11px;color:var(--text-secondary);line-height:1.4;margin-top:.25rem}
+.area-bars{margin:.5rem 0}
+.area-bar-row{display:flex;align-items:center;gap:6px;margin:.2rem 0}
+.area-bar-label{font-size:10px;color:var(--text-secondary);min-width:110px;line-height:1.3}
+.area-bar-track{flex:1;height:10px;border-radius:5px;background:var(--bg-secondary);overflow:hidden}
+.area-bar-fill{height:100%;border-radius:5px;transition:width .3s}
+.area-bar-val{font-size:10px;font-weight:600;min-width:36px;text-align:right}
+.area-bars-title{font-size:10px;color:var(--text-tertiary);margin-bottom:.3rem}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend-sw{width:18px;height:3px;border-radius:2px;flex-shrink:0}
+.chart-col{min-width:0;overflow:hidden}
+.chart-col canvas{display:block;width:100%!important}
+.comp-sec{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text-tertiary);margin:.5rem 0 .3rem}
+.cbar-row{display:flex;align-items:center;gap:5px;margin:.25rem 0}
+.cbar-method{font-size:11px;color:var(--text-secondary);min-width:120px;line-height:1.3}
+.cbar-center{flex:1;display:flex;align-items:center;position:relative;height:14px}
+.cbar-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border-secondary)}
+.cbar-neg{position:absolute;right:50%;top:2px;bottom:2px;border-radius:4px 0 0 4px;transition:width .35s}
+.cbar-pos{position:absolute;left:50%;top:2px;bottom:2px;border-radius:0 4px 4px 0;transition:width .35s}
+.cbar-val{font-size:11px;font-weight:600;min-width:42px;text-align:right}
+@media(max-width:600px){
+  body{padding:0}
+  .page{border-radius:0;padding:1rem}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .timeline{flex-direction:column}
+  .tl-item:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-8px}
+}
+</style>
+</head>
+<body>
+
+<div id="width-ref" style="width:100%;height:0;pointer-events:none"></div>
+
+<div class="page">
+<a class="home-link" href="../">← Tanya Tsui</a>
+<div class="deck">
+<div class="topnav" id="topnav"></div>
+<div id="slides">
+
+<!-- 1 INTRO -->
+<div class="slide active">
+  <div class="eyebrow">Carbon sequestration in bio-based materials</div>
+  <h2>Plants breathe in CO₂. What happens when they become buildings?</h2>
+  <p class="lead">When a plant grows, it pulls carbon dioxide out of the atmosphere and locks it into its fibers. If that plant becomes a building material — timber, hemp insulation, a straw bale — that carbon stays stored for decades.</p>
+  <div class="timeline">
+    <div class="tl-item" style="background:var(--green-light);border-radius:8px 0 0 8px"><div class="icon">🌱</div><div class="label">Growth</div><div class="sub">Plant absorbs CO₂ from air</div></div>
+    <div class="tl-item" style="background:var(--blue-light)"><div class="icon">🏗️</div><div class="label">Product life</div><div class="sub">Carbon locked in material</div></div>
+    <div class="tl-item" style="background:var(--amber-light);border-radius:0 8px 8px 0"><div class="icon">🔥</div><div class="label">End of life</div><div class="sub">Carbon re-released via incineration or decomposition</div></div>
+  </div>
+  <p>The storage is <em>temporary</em> — carbon always returns to the atmosphere eventually. So how much climate credit should we give to a material that stores carbon for 50 years? For 100?</p>
+  <div class="callout green">The answer depends entirely on which accounting method you use — and different methods give completely different answers to the same question. This explainer walks through four methods used in Life Cycle Assessment (LCA) and explains what's at stake when policy starts rewarding temporary carbon storage.</div>
+</div>
+
+<!-- 2 STATIC -->
+<div class="slide">
+  <div class="eyebrow">Method 1 of 4</div>
+  <h2>Static −1/+1: the simplest approach</h2>
+  <p class="lead">The most widely used method. When a plant grows it absorbs 1 kg of CO₂ — recorded as −1. When the material is incinerated or decomposes at end of life, that carbon is released — recorded as +1. Net result: always zero, regardless of how long the storage lasts.</p>
+  <div class="three-col">
+    <div class="mini-card"><div class="num" style="color:var(--green)">−1 kg</div><div class="lbl">CO₂ absorbed during growth</div></div>
+    <div class="mini-card"><div class="num" style="color:var(--coral)">+1 kg</div><div class="lbl">CO₂ released at end of life</div></div>
+    <div class="mini-card"><div class="num" style="color:var(--gray)">= 0</div><div class="lbl">net result, always</div></div>
+  </div>
+  <h3 style="margin-top:.5rem">The trade-off</h3>
+  <p>Static accounting treats a material storing carbon for 5 years exactly the same as one storing it for 500. It is deliberately neutral — neither penalizing nor rewarding timing. This makes it simple, transparent, and comparable across studies.</p>
+  <div class="callout amber">The limitation: timing matters for the climate. Delaying a CO₂ release by 100 years gives the atmosphere time to adjust and other technologies time to develop. Static accounting cannot capture this — and cannot distinguish between a fast-regrowing hemp crop and a slow-growing forest.</div>
+  <p>Used in: standard LCA (ISO 14044), European construction product standard EN 15804, and most Environmental Product Declarations (EPDs) today.</p>
+  <div class="ref">ISO 14044:2006. Environmental management — Life cycle assessment. · EN 15804:2012+A2:2019. Sustainability of construction works — EPDs for construction products.</div>
+</div>
+
+<!-- 3 RF EXPLAINER -->
+<div class="slide">
+  <div class="eyebrow">Background concept</div>
+  <h2>How do we measure the warming effect of a CO₂ emission?</h2>
+  <p class="lead">Before we get to Methods 2, 3, and 4, we need one shared concept — they all boil down to comparing areas under decay curves like the one below. When CO₂ is released, it doesn't cause warming all at once — it traps heat gradually, over decades. Scientists measure this using <strong>radiative forcing</strong>: the extra heat trapped by CO₂ in the atmosphere at any given moment.</p>
+  <p>CO₂ doesn't stay in the atmosphere forever. Over time it gets absorbed by oceans and plants, and its warming effect fades — giving us a <strong>decay curve</strong>.</p>
+  <div class="callout blue">The <strong>total warming caused by an emission</strong> is the sum of all radiative forcing it causes over time — the <strong>shaded area under the decay curve</strong>. A bigger area = more total warming.</div>
+  <canvas id="rf-chart" height="180" style="max-width:520px;margin:.75rem 0"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);max-width:520px"><span>Year 0 (emission)</span><span>Year 500</span></div>
+  <div class="legend" style="margin-top:.5rem">
+    <div class="legend-item"><div style="width:12px;height:10px;background:rgba(24,95,165,0.2);border-radius:2px;flex-shrink:0"></div>total warming = area under curve</div>
+    <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.8)"></div>radiative forcing (warming per year)</div>
+  </div>
+  <p style="margin-top:.6rem">This "compare the areas under two decay curves" idea is the foundation for the three accounting methods that follow — each one keeps this same logic, but changes exactly <em>what</em> gets compared to what, and that's what makes them disagree with each other:</p>
+  <div class="three-col" style="margin-top:.4rem">
+    <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
+      <div style="font-size:11px;font-weight:600;color:var(--blue-mid);margin-bottom:.25rem">Method 2 · Dynamic LCA</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>storage period</strong> — how long carbon sits in the product before release.</div>
+    </div>
+    <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
+      <div style="font-size:11px;font-weight:600;color:var(--green-dark);margin-bottom:.25rem">Method 3 · Cherubini et al.</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>rotation period</strong> — how fast the harvested plant regrows.</div>
+    </div>
+    <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
+      <div style="font-size:11px;font-weight:600;color:var(--coral-dark);margin-bottom:.25rem">Method 4 · Guest et al.</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>both</strong> storage period and rotation period together.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 4 DYNAMIC LCA -->
+<div class="slide">
+  <div class="eyebrow">Method 2 of 4</div>
+  <h2>Dynamic LCA (Levasseur et al.): when you release CO₂ matters</h2>
+  <p class="lead">If carbon is stored in a building for 50 years and only released at end of life, that delayed emission causes less total warming than if released immediately — because it occupies less of the time window we care about.</p>
+  <p>Dynamic LCA captures this with a <strong>characterization factor (DCF)</strong> applied to the biogenic release at end of life. It is the ratio of two shaded areas on the chart:</p>
+  <div class="formula-plain">
+    <div class="fline">DCF = <span style="color:var(--green-dark)">(dark green area)</span> ÷ <span style="color:var(--blue-mid)">(blue area)</span></div>
+    <div class="fcomment">Blue area: total warming from a reference CO₂ emission at year 0, counted to horizon T. Dark green area: total warming from the biogenic emission at year τ, counted from τ to T. Because the green curve starts later, less of it fits in the window — so the green area is smaller and DCF &lt; 1.<br>The DCF is applied only to the <strong>release</strong> — not the uptake. Lower DCF = less warming counted = more climate benefit.</div>
+  </div>
+  <div class="two-col" style="align-items:start;margin-top:.5rem">
+    <div>
+      <div class="slider-row"><label>Storage period (τ)</label><input type="range" id="dyn-s" min="1" max="499" value="50" step="1"><span class="val" id="dyn-sv">50 yr</span></div>
+      <div class="slider-row"><label>Time horizon (T)</label><input type="range" id="dyn-h" min="20" max="500" value="100" step="1"><span class="val" id="dyn-hv">100 yr</span></div>
+      <div class="cf-block" style="margin-top:.6rem">
+        <div class="cf-label">Characterization factor (DCF)</div>
+        <div class="cf-number" id="dyn-cf">—</div>
+        <div class="cf-interp" id="dyn-interp"></div>
+      </div>
+      <div class="three-col" style="gap:.35rem;margin-top:.5rem">
+        <div class="mini-card" style="padding:.4rem .5rem"><div class="num" style="font-size:14px;color:var(--green)">−1.000</div><div class="lbl">uptake yr 0</div></div>
+        <div class="mini-card" style="padding:.4rem .5rem"><div class="num" style="font-size:14px;color:var(--coral)" id="dyn-rel">—</div><div class="lbl">release yr τ</div></div>
+        <div class="mini-card" style="padding:.4rem .5rem"><div class="num" style="font-size:14px" id="dyn-net">—</div><div class="lbl">net kg CO₂e</div></div>
+      </div>
+      <div class="area-bars" style="margin-top:.5rem">
+        <div class="area-bars-title">Area comparison (→ DCF ratio)</div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--blue-mid)">Blue — reference</span><div class="area-bar-track"><div class="area-bar-fill" style="width:100%;background:rgba(24,95,165,0.45)"></div></div><span class="area-bar-val" id="dyn-bv">—</span></div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--green-dark)">Dark green — biogenic</span><div class="area-bar-track"><div class="area-bar-fill" id="dyn-gb" style="background:rgba(8,80,65,0.55)"></div></div><span class="area-bar-val" id="dyn-gv">—</span></div>
+      </div>
+      <div class="legend" style="margin-top:.35rem">
+        <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.65)"></div>reference (blue)</div>
+        <div class="legend-item"><div class="legend-sw" style="background:var(--green-dark)"></div>biogenic at τ (dark green)</div>
+      </div>
+    </div>
+    <div class="chart-col">
+      <canvas id="dyn-chart" height="240"></canvas>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);margin-top:2px"><span>Year 0</span><span>Year 500</span></div>
+    </div>
+  </div>
+  <div class="callout amber" style="margin-top:.6rem">Try it: the higher the storage period, the higher the credit (the more negative the net result) — more of the delayed release gets pushed outside the accounting window. The time horizon cuts the <em>other</em> way, though — stretch it out and the credit actually shrinks back toward zero, because a longer window also counts more of the (otherwise unaffected) reference curve. The real quirk to watch for sits at the extreme: set the horizon <em>shorter</em> than the storage period and the release falls outside the window entirely — "not counted at all" — handing the material the maximum possible credit for nothing more than an accounting choice, before any real material property comes into play.</div>
+  <div class="ref">Levasseur, A. et al. (2010). Considering time in LCA: dynamic LCA and its application to global warming impact assessments. <em>Environmental Science & Technology</em>, 44(8), 3169–3174.</div>
+</div>
+
+<!-- 5 CHERUBINI -->
+<div class="slide">
+  <div class="eyebrow">Method 3 of 4</div>
+  <h2>GWP<sub>bio</sub> (Cherubini et al.): rotation period matters</h2>
+  <p class="lead">Designed for biofuels and food — materials that release carbon almost immediately after harvest. No long storage period. The key question: how fast does the plant regrow and reabsorb that carbon?</p>
+  <p>A key assumption drives this method: whatever biomass is harvested is assumed to be replanted and fully regrown. Chop down a tree to burn as fuel, and the model assumes a new tree takes its place. The accounting then pairs two things — the burning of the tree you just felled, and the regrowth of the <em>replacement</em> tree — not the sequestration the original tree already performed while it was alive. That original sequestration is treated as already "spent"; the credit for pulling CO₂ back out of the atmosphere belongs entirely to whatever grows next. That's why the variable that matters here is rotation period — how fast the replacement grows — rather than anything about the tree that was cut down.</p>
+  <div class="formula-plain">
+    <div class="fline">GWP<sub>bio</sub> = <span style="color:var(--green-dark)">net biogenic decay area</span> ÷ <span style="color:var(--blue-mid)">fossil reference area</span></div>
+    <div class="fcomment">The net biogenic curve (dark green) isn't just "emission minus a separate regrowth curve" — it's the harvest pulse with the gradual regrowth uptake mathematically combined into it (a convolution), since carbon reabsorbed at any point in time keeps decaying through the atmosphere from that moment onward. Faster rotation pulls more of the curve below zero, sooner = lower GWP_bio = better climate performance.</div>
+  </div>
+  <div class="two-col" style="align-items:start;margin-top:.5rem">
+    <div>
+      <div class="slider-row"><label>Rotation period (r)</label><input type="range" id="ch-r" min="1" max="100" value="10" step="1"><span class="val" id="ch-rv">10 yr</span></div>
+      <div class="slider-row"><label>Time horizon (T)</label><input type="range" id="ch-h" min="20" max="500" value="100" step="1"><span class="val" id="ch-hv">100 yr</span></div>
+      <div class="cf-block" style="margin-top:.6rem">
+        <div class="cf-label">GWP<sub>bio</sub> (Cherubini et al.)</div>
+        <div class="cf-number" id="ch-cf">—</div>
+        <div class="cf-interp" id="ch-interp"></div>
+      </div>
+      <div class="area-bars" style="margin-top:.5rem">
+        <div class="area-bars-title">Area comparison (→ GWP_bio ratio)</div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--blue-mid)">Blue — reference</span><div class="area-bar-track"><div class="area-bar-fill" style="width:100%;background:rgba(24,95,165,0.45)"></div></div><span class="area-bar-val" id="ch-bv">—</span></div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--green-dark)">Dark green — net biogenic</span><div class="area-bar-track"><div class="area-bar-fill" id="ch-gb" style="background:rgba(8,80,65,0.55)"></div></div><span class="area-bar-val" id="ch-gv">—</span></div>
+      </div>
+      <div class="legend" style="margin-top:.35rem">
+        <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.65)"></div>reference (blue)</div>
+        <div class="legend-item"><div class="legend-sw" style="background:var(--green-dark)"></div>net biogenic decay (dark green)</div>
+      </div>
+    </div>
+    <div class="chart-col">
+      <canvas id="ch-chart" height="240"></canvas>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);margin-top:2px"><span>Year 0</span><span>Year 500</span></div>
+    </div>
+  </div>
+  <div class="callout amber" style="margin-top:.6rem">Try it: the higher the rotation period, the higher the net emission. A slower-growing replacement simply takes longer to reabsorb the carbon its predecessor released — so more of that warming counts within the time horizon before regrowth can offset it.</div>
+  <div class="ref">Cherubini, F. et al. (2011). CO₂ emissions from biomass combustion for bioenergy: atmospheric decay and contribution to global warming. <em>GCB Bioenergy</em>, 3(5), 413–426.</div>
+</div>
+
+<!-- 6 GUEST -->
+<div class="slide">
+  <div class="eyebrow">Method 4 of 4</div>
+  <h2>GWP<sub>bio</sub> (Guest et al.): rotation <em>and</em> storage</h2>
+  <p class="lead">Guest et al. extend Cherubini's method for materials with long lifetimes: the harvested carbon isn't released right away — it's stored for τ years first, and only then combusted. Regrowth begins immediately either way.</p>
+  <p>This method carries over Cherubini's core assumption — and its limitation. It still assumes the harvested biomass is fully replaced by newly planted biomass, regrowing right on schedule every time. Land-use change, regrowth that's delayed or never happens, or a forest that's degraded rather than replanted — none of that is captured here. The model only ever compares a harvest against its assumed, guaranteed replacement.</p>
+  <div class="formula-plain">
+    <div class="fline">GWP<sub>bio</sub>(τ,r) = <span style="color:var(--green-dark)">net biogenic decay area</span> ÷ <span style="color:var(--blue-mid)">fossil reference area</span></div>
+    <div class="fcomment">Same ratio as Cherubini's method — only the timing of the release pulse changes. Before τ, only regrowth is drawing carbon down (the curve dips below zero). At τ, the stored carbon is released in one pulse (a vertical jump); from there the curve follows fossil-style decay, still net of the regrowth that keeps running underneath it. Set τ=0 and this collapses exactly to the Cherubini curve.</div>
+  </div>
+  <div class="two-col" style="align-items:start;margin-top:.5rem">
+    <div>
+      <div class="slider-row"><label>Storage period (τ)</label><input type="range" id="gu-s" min="5" max="99" value="50" step="1"><span class="val" id="gu-sv">50 yr</span></div>
+      <div class="slider-row"><label>Rotation period (r)</label><input type="range" id="gu-r" min="1" max="100" value="10" step="1"><span class="val" id="gu-rv">10 yr</span></div>
+      <div class="slider-row"><label>Time horizon (T)</label><input type="range" id="gu-h" min="20" max="500" value="100" step="1"><span class="val" id="gu-hv">100 yr</span></div>
+      <div class="cf-block" style="margin-top:.5rem">
+        <div class="cf-label">GWP<sub>bio</sub> (Guest et al.)</div>
+        <div class="cf-number" id="gu-cf">—</div>
+        <div class="cf-interp" id="gu-interp"></div>
+      </div>
+      <div class="area-bars" style="margin-top:.5rem">
+        <div class="area-bars-title">Area comparison (→ GWP_bio ratio)</div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--blue-mid)">Blue — reference</span><div class="area-bar-track"><div class="area-bar-fill" style="width:100%;background:rgba(24,95,165,0.45)"></div></div><span class="area-bar-val" id="gu-bv">—</span></div>
+        <div class="area-bar-row"><span class="area-bar-label" style="color:var(--green-dark)">Dark green — net biogenic</span><div class="area-bar-track"><div class="area-bar-fill" id="gu-gb" style="background:rgba(8,80,65,0.55)"></div></div><span class="area-bar-val" id="gu-gv">—</span></div>
+      </div>
+      <div class="legend" style="margin-top:.35rem">
+        <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.65)"></div>reference (blue)</div>
+        <div class="legend-item"><div class="legend-sw" style="background:var(--green-dark)"></div>net biogenic decay (dark green)</div>
+      </div>
+    </div>
+    <div class="chart-col">
+      <canvas id="gu-chart" height="240"></canvas>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);margin-top:2px"><span>Year 0</span><span>Year 500</span></div>
+    </div>
+  </div>
+  <div class="callout amber" style="margin-top:.6rem">Try it: the higher the rotation period, the higher the net emission (same reason as Cherubini's method — slower regrowth means more warming counted before it's offset). The higher the storage period, the lower the net emission (same reason as the Dynamic LCA method — more of the release is pushed outside the window). The time horizon behaves differently from both: stretching it doesn't push the result in one direction — it dampens whatever result you already have back toward zero, shrinking credits and penalties alike the further out you look.</div>
+  <div class="ref">Guest, G. et al. (2013). New approach to characterize the biogenic carbon balance of a temporary carbon sink. <em>Journal of Industrial Ecology</em>, 17(5), 743–754.</div>
+</div>
+
+<!-- 7 COMPARISON -->
+<div class="slide">
+  <div class="eyebrow">Putting it together</div>
+  <h2>Same material, four different answers</h2>
+  <p class="lead">Different methods lead to different answers for the exact same scenario — not because the material changes, but because each method counts different things. Explore two real materials: slow-growing timber (100-year rotation) and fast-growing hemp (1-year rotation). Bars extending left are negative — a climate benefit. The further left, the better.</p>
+  <div class="callout blue" style="font-size:12px">Notice the floor: Static and GWP<sub>bio</sub> Cherubini can never go below zero — the best either can do is a neutral result. Dynamic LCA and GWP<sub>bio</sub> Guest have no such floor: both can swing negative, crediting a material with a genuine net climate benefit.</div>
+  <div class="slider-row" style="max-width:360px;margin-bottom:.75rem"><label>Building lifespan</label><input type="range" id="comp-l" min="10" max="100" value="50" step="5"><span class="val" id="comp-lv">50 yr</span></div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-secondary);margin-bottom:.5rem">
+    <span>← more climate benefit</span>
+    <div style="flex:1;max-width:180px;height:1px;background:var(--border-tertiary);position:relative"><div style="position:absolute;left:50%;top:-3px;width:1px;height:7px;background:var(--border-secondary)"></div></div>
+    <span>less benefit →</span>
+  </div>
+  <div class="two-col">
+    <div><div class="comp-sec">🌲 Timber — rotation 100 yr</div><div id="comp-timber"></div></div>
+    <div><div class="comp-sec">🌿 Hemp — rotation 1 yr</div><div id="comp-hemp"></div></div>
+  </div>
+  <div class="callout coral" id="comp-insight" style="font-size:12px;margin-top:.6rem"></div>
+  <p style="font-size:11px;margin-top:.5rem">Push the building lifespan up and watch timber specifically: under GWP<sub>bio</sub> Cherubini its result stays flatly positive — that method has no concept of storage at all, so a long building life changes nothing. Under GWP<sub>bio</sub> Guest, the very same 100-year-rotation timber can swing negative — a net climate benefit. Same material, same scenario, opposite verdicts, purely because of what each method was built to count.</p>
+  <div class="callout green" style="margin-top:.6rem"><strong>Take-home message:</strong> no method here is simply "right" or "wrong" — each accounts for a different piece of the timing story (time horizon, storage period, rotation period) and leaves the rest out. That choice isn't neutral. The moment policy starts attaching carbon credits, product comparisons, or building certifications to one of these numbers, the choice of accounting method stops being an academic detail and starts determining which products, materials, and timelines actually get rewarded.</div>
+</div>
+
+</div><!-- /slides -->
+<div class="botnav">
+  <button id="btn-prev">← Back</button>
+  <span class="sp"></span>
+  <button id="btn-next" class="primary">Next →</button>
+</div>
+</div><!-- /deck -->
+</div><!-- /page -->
+
+<script>
+const slides=Array.from(document.querySelectorAll('.slide'));
+const N=slides.length;
+const labels=['Introduction','Static −1/+1','How warming is measured','Dynamic LCA','GWPbio Cherubini','GWPbio Guest et al.','Four methods compared'];
+let cur=0;
+
+function stableWidth(){return document.getElementById('width-ref').getBoundingClientRect().width||500;}
+
+function buildNav(){
+  const wrap=document.getElementById('topnav');
+  wrap.innerHTML='';
+  for(let i=0;i<N;i++){
+    const pip=document.createElement('button');
+    pip.className='pip'+(i<cur?' done':i===cur?' cur':'');
+    pip.title=labels[i];
+    pip.onclick=(n=>()=>goTo(n))(i);
+    wrap.appendChild(pip);
+  }
+  const lbl=document.createElement('span');
+  lbl.className='slide-lbl';
+  lbl.textContent=labels[cur]+' · '+(cur+1)+'/'+N;
+  wrap.appendChild(lbl);
+  const mw=document.createElement('div');mw.className='menu-wrap';
+  const mb=document.createElement('button');mb.className='menu-btn';mb.textContent='Jump to ▾';
+  const ml=document.createElement('div');ml.className='menu-list';
+  mb.onclick=e=>{e.stopPropagation();ml.classList.toggle('open');};
+  labels.forEach((l,i)=>{
+    const mi=document.createElement('button');
+    mi.className='menu-item'+(i===cur?' active':'');
+    mi.innerHTML=`<span class="mn">${i+1}</span>${l}`;
+    mi.onclick=()=>{ml.classList.remove('open');goTo(i);};
+    ml.appendChild(mi);
+  });
+  mw.appendChild(mb);mw.appendChild(ml);
+  wrap.appendChild(mw);
+}
+document.addEventListener('click',()=>{
+  const ml=document.querySelector('.menu-list.open');
+  if(ml)ml.classList.remove('open');
+});
+
+function goTo(n){
+  slides[cur].classList.remove('active');
+  cur=Math.max(0,Math.min(n,N-1));
+  slides[cur].classList.add('active');
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-prev').style.opacity=cur===0?'0.35':'1';
+  document.getElementById('btn-next').textContent=cur===N-1?'Start over ↺':'Next →';
+  buildNav();
+  requestAnimationFrame(()=>requestAnimationFrame(renderCurrent));
+}
+document.getElementById('btn-next').onclick=()=>cur===N-1?goTo(0):goTo(cur+1);
+document.getElementById('btn-prev').onclick=()=>goTo(cur-1);
+
+// ── PHYSICS ──
+function rfDecay(t){if(t<0)return 0;return 0.217+0.259*Math.exp(-t/172.9)+0.338*Math.exp(-t/18.51)+0.186*Math.exp(-t/1.186);}
+function integrate(fn,a,b,n=400){if(b<=a)return 0;const dt=(b-a)/n;let s=0;for(let i=0;i<n;i++)s+=fn(a+i*dt)*dt;return s;}
+function fossilArea(T){return integrate(t=>rfDecay(t),0,T);}
+function getDCF(tau,T){if(tau>=T)return 0;return integrate(t=>rfDecay(t-tau),tau,T)/fossilArea(T);}
+
+// Gaussian regrowth rate (Cherubini et al. 2011, Eq. 5): mu = r/2, sigma = mu/2 = r/4.
+// Truncated at t=0 and renormalized so total mass over [0,inf) integrates to 1
+// (otherwise ~2.3% of the regrowth mass falls below t=0 and is lost, biasing GWPbio upward).
+function erf(x){
+  // Abramowitz-Stegun approximation
+  const sign=x<0?-1:1;x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normCdf(x,mu,sigma){return 0.5*(1+erf((x-mu)/(sigma*Math.SQRT2)));}
+function gaussRegrowthRate(t,r){
+  const mu=r/2,sigma=mu/2;
+  const massBelow0=normCdf(0,mu,sigma);
+  const normFactor=1/(1-massBelow0);
+  if(t<0)return 0;
+  const raw=(1/(Math.sqrt(2*Math.PI)*sigma))*Math.exp(-((t-mu)**2)/(2*sigma*sigma));
+  return raw*normFactor;
+}
+// Cumulative regrowth uptake convolved with atmospheric decay: ∫₀ᵗ g(t')·y(t−t') dt'.
+// Shared by the Cherubini curve (pulse at t=0) and the Guest curve (pulse at t=τ) — the same
+// ongoing-regrowth perturbation underlies both; only the timing of the release pulse differs.
+function convGrowth(t,r,steps=140){
+  if(t<=0)return 0;
+  const maxDtp=Math.max(r/16,0.05);
+  const nSteps=Math.min(6000,Math.max(steps,Math.ceil(t/maxDtp)));
+  const dtp=t/nSteps;let conv=0;
+  for(let i=0;i<nSteps;i++){
+    const tp=(i+0.5)*dtp;
+    conv+=gaussRegrowthRate(tp,r)*rfDecay(t-tp)*dtp;
+  }
+  return conv;
+}
+// FIRF atmospheric decay of biogenic pulse (Cherubini Eq. 8): f(t) = y(t) - convolution(g, y)
+function biogenicDecayFIRF(t,r,steps=140){
+  if(t<=0)return 1;
+  return rfDecay(t)-convGrowth(t,r,steps);
+}
+// Guest et al. (2012) Eq. 8: the harvest/regrowth pulse is released at t=τ instead of t=0, while
+// regrowth uptake has already been running since t=0 and keeps running afterward. Setting τ=0
+// collapses this exactly to the Cherubini curve above — same convolution, pulse just isn't delayed.
+function guestDecay(t,tau,r,steps=140){
+  const rel=t>=tau?rfDecay(t-tau):0;
+  return rel-convGrowth(t,r,steps);
+}
+function gwpCherubini(r,T=100){
+  const den=fossilArea(T);
+  const num=integrate(t=>biogenicDecayFIRF(t,r),0,T,200);
+  return num/den;
+}
+function gwpGuest(tau,r,T=100){
+  const den=fossilArea(T);
+  const num=integrate(t=>guestDecay(t,tau,r),0,T,200);
+  return num/den;
+}
+
+// ── CANVAS ──
+function setupCanvas(id,h){
+  const c=document.getElementById(id);if(!c)return null;
+  const dpr=window.devicePixelRatio||1;
+  const totalW=stableWidth();
+  const w=Math.floor(totalW/2)-20;
+  if(w<50)return null;
+  c.style.width=w+'px';c.style.height=h+'px';
+  c.width=w*dpr;c.height=h*dpr;
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  return{ctx,w,h};
+}
+function setupCanvasFull(id,h){
+  const c=document.getElementById(id);if(!c)return null;
+  const dpr=window.devicePixelRatio||1;
+  const w=Math.min(Math.floor(stableWidth()),520);
+  if(w<50)return null;
+  c.style.width=w+'px';c.style.height=h+'px';
+  c.width=w*dpr;c.height=h*dpr;
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  return{ctx,w,h};
+}
+
+function axes(ctx,w,h,pad,hasNeg){
+  ctx.save();ctx.strokeStyle='rgba(128,128,128,0.2)';ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,h-pad.b);ctx.stroke();
+  const z=hasNeg?pad.t+(h-pad.b-pad.t)*0.5:h-pad.b;
+  ctx.beginPath();ctx.moveTo(pad.l,z);ctx.lineTo(w-pad.r,z);ctx.stroke();
+  ctx.restore();return z;
+}
+function mkpts(fn,t0,t1,maxT,pad,w,h,yMax,z,hasNeg,steps=300){
+  const arr=[];
+  for(let i=0;i<=steps;i++){
+    const t=t0+(t1-t0)*i/steps,v=fn(t);
+    const px=pad.l+(w-pad.l-pad.r)*t/maxT;
+    const half=hasNeg?(h-pad.b-pad.t)*0.5:(h-pad.b-pad.t);
+    arr.push({x:px,y:z-v/yMax*half});
+  }return arr;
+}
+function fill(ctx,arr,z,fc,sc,lw=2){
+  if(arr.length<2)return;
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(arr[0].x,z);arr.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(arr[arr.length-1].x,z);ctx.closePath();ctx.fillStyle=fc;ctx.fill();
+  ctx.beginPath();arr.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.strokeStyle=sc;ctx.lineWidth=lw;ctx.stroke();
+  ctx.restore();
+}
+function dash(ctx,x1,y1,x2,y2,col='rgba(128,128,128,0.45)',d=[4,3]){
+  ctx.save();ctx.setLineDash(d);ctx.strokeStyle=col;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+function ylab(ctx,h,txt){
+  ctx.save();ctx.fillStyle='rgba(128,128,128,0.5)';ctx.font='9px sans-serif';
+  ctx.translate(9,h/2);ctx.rotate(-Math.PI/2);ctx.fillText(txt,0,0);ctx.restore();
+}
+
+// ── SLIDE 3: RF (static) ──
+function renderRF(){
+  const cv=setupCanvasFull('rf-chart',180);if(!cv)return;
+  const{ctx,w,h}=cv;const pad={l:36,r:10,t:12,b:18};
+  ctx.clearRect(0,0,w,h);
+  const z=axes(ctx,w,h,pad,false);
+  const maxT=500,yMax=rfDecay(0)*1.15;
+  fill(ctx,mkpts(t=>rfDecay(t),0,maxT,maxT,pad,w,h,yMax,z,false),z,'rgba(24,95,165,0.18)','rgba(24,95,165,0.8)');
+  ctx.fillStyle='rgba(24,95,165,0.6)';ctx.font='10px sans-serif';
+  ctx.fillText('total warming = area under curve',pad.l+10,pad.t+18);
+  ylab(ctx,h,'Radiative forcing');
+}
+
+// ── SLIDE 4: DYNAMIC ──
+function renderDynamic(){
+  const tau=+document.getElementById('dyn-s').value;
+  const T=+document.getElementById('dyn-h').value;
+  document.getElementById('dyn-sv').textContent=tau+' yr';
+  document.getElementById('dyn-hv').textContent=T+' yr';
+  const fosA=fossilArea(T);
+  const bioA=tau<T?integrate(t=>rfDecay(t-tau),tau,T):0;
+  const dcf=fosA>0?bioA/fosA:0;
+  document.getElementById('dyn-cf').textContent=dcf.toFixed(3);
+  document.getElementById('dyn-cf').style.color=dcf<0.4?'var(--green)':dcf<0.7?'var(--amber)':'var(--coral)';
+  document.getElementById('dyn-interp').textContent=
+    tau>=T?'Release falls beyond the horizon — not counted at all.':
+    dcf<0.2?'Very delayed: most warming avoided within the time horizon.':
+    dcf<0.5?'Meaningful delay: significant warming avoided.':
+    dcf<0.8?'Short storage: limited timing benefit.':'Release is early — close to an immediate fossil emission.';
+  const rel=dcf,net=-1+rel;
+  document.getElementById('dyn-rel').textContent='+'+rel.toFixed(3);
+  const ne=document.getElementById('dyn-net');ne.textContent=net.toFixed(3);
+  ne.style.color=net<-0.5?'var(--green)':net>-0.1?'var(--coral)':'var(--amber)';
+  document.getElementById('dyn-bv').textContent=fosA.toFixed(2);
+  document.getElementById('dyn-gv').textContent=bioA.toFixed(2);
+  document.getElementById('dyn-gb').style.width=fosA>0?Math.round(Math.min(1,bioA/fosA)*100)+'%':'0%';
+
+  const cv=setupCanvas('dyn-chart',240);if(!cv)return;
+  const{ctx,w,h}=cv;const pad={l:36,r:10,t:14,b:18};
+  ctx.clearRect(0,0,w,h);
+  const z=axes(ctx,w,h,pad,false);const maxT=500,yMax=rfDecay(0)*1.15;
+  fill(ctx,mkpts(t=>rfDecay(t),0,Math.min(T,maxT),maxT,pad,w,h,yMax,z,false),z,'rgba(24,95,165,0.12)','rgba(24,95,165,0.6)');
+  if(tau<T)fill(ctx,mkpts(t=>rfDecay(t-tau),tau,Math.min(T,maxT),maxT,pad,w,h,yMax,z,false),z,'rgba(8,80,65,0.15)','rgba(8,80,65,0.85)');
+  const hX=pad.l+(w-pad.l-pad.r)*T/maxT;
+  dash(ctx,hX,pad.t,hX,h-pad.b);
+  ctx.save();ctx.fillStyle='rgba(180,180,180,0.10)';ctx.fillRect(hX,pad.t,w-pad.r-hX,h-pad.b-pad.t);ctx.restore();
+  ctx.fillStyle='rgba(128,128,128,0.7)';ctx.font='9px sans-serif';ctx.fillText('T='+T,hX+3,pad.t+10);
+  if(tau>0&&tau<maxT){
+    const tX=pad.l+(w-pad.l-pad.r)*tau/maxT;
+    dash(ctx,tX,pad.t,tX,h-pad.b,'rgba(8,80,65,0.5)');
+    ctx.fillStyle='rgba(8,80,65,0.8)';ctx.font='9px sans-serif';ctx.fillText('τ='+tau,tX+2,pad.t+10);
+  }
+  ylab(ctx,h,'Radiative forcing');
+}
+
+// ── SLIDE 5: CHERUBINI (FIRF convolution model, matches Cherubini et al. 2011 Table 3) ──
+function renderCherubini(){
+  const r=+document.getElementById('ch-r').value;
+  const T=+document.getElementById('ch-h').value;
+  document.getElementById('ch-rv').textContent=r+' yr';
+  document.getElementById('ch-hv').textContent=T+' yr';
+  const fosA=fossilArea(T);
+  const posA=integrate(t=>Math.max(0,biogenicDecayFIRF(t,r)),0,T,200);
+  const negA=integrate(t=>Math.max(0,-biogenicDecayFIRF(t,r)),0,T,200);
+  const bioA=posA-negA;
+  const gwp=fosA>0?bioA/fosA:0;
+  document.getElementById('ch-cf').textContent=gwp.toFixed(3);
+  document.getElementById('ch-cf').style.color=gwp<0.3?'var(--green)':gwp<0.65?'var(--amber)':'var(--coral)';
+  document.getElementById('ch-interp').textContent=gwp<0.15?'Very fast regrowth — nearly all harvest warming offset within the horizon.':gwp<0.4?'Fast regrowth — significant offset, strong climate benefit.':gwp<0.7?'Moderate regrowth — partial offset within the horizon.':'Slow regrowth — little offset within the horizon, near-fossil performance.';
+
+  document.getElementById('ch-bv').textContent=fosA.toFixed(2);
+  document.getElementById('ch-gv').textContent=bioA.toFixed(2);
+  document.getElementById('ch-gb').style.width=fosA>0?Math.round(Math.min(1,Math.abs(bioA)/fosA)*100)+'%':'0%';
+
+  const cv=setupCanvas('ch-chart',240);if(!cv)return;
+  const{ctx,w,h}=cv;const pad={l:36,r:10,t:18,b:18};
+  ctx.clearRect(0,0,w,h);const z=axes(ctx,w,h,pad,true);const maxT=500,yMax=rfDecay(0)*1.1;
+  // fossil reference, solid filled area (matches Method 2's dynamic LCA chart)
+  const fp=mkpts(t=>rfDecay(t),0,Math.min(T,maxT),maxT,pad,w,h,yMax,z,true);
+  fill(ctx,fp,z,'rgba(24,95,165,0.12)','rgba(24,95,165,0.6)');
+  // net biogenic decay curve f(t) — the real FIRF convolution result, can dip negative (ocean outgassing)
+  const bioPts=mkpts(t=>biogenicDecayFIRF(t,r,60),0,Math.min(T,maxT),maxT,pad,w,h,yMax,z,true,160);
+  fill(ctx,bioPts,z,'rgba(8,80,65,0.15)','rgba(8,80,65,0.85)');
+  const hX=pad.l+(w-pad.l-pad.r)*Math.min(T,maxT)/maxT;
+  dash(ctx,hX,pad.t,hX,h-pad.b);
+  ctx.save();ctx.fillStyle='rgba(180,180,180,0.10)';ctx.fillRect(hX,pad.t,w-pad.r-hX,h-pad.b-pad.t);ctx.restore();
+  ctx.fillStyle='rgba(128,128,128,0.7)';ctx.font='9px sans-serif';ctx.fillText('T='+T,hX+3,pad.t+10);
+  if(r<=Math.min(T,maxT)){const rX=pad.l+(w-pad.l-pad.r)*r/maxT;dash(ctx,rX,pad.t,rX,h-pad.b,'rgba(8,80,65,0.45)');ctx.fillStyle='rgba(8,80,65,0.75)';ctx.font='9px sans-serif';ctx.fillText('r='+r,rX+2,pad.t+10);}
+  ctx.fillStyle='rgba(128,128,128,0.5)';ctx.font='9px sans-serif';ctx.fillText('+warming',pad.l+4,pad.t+12);ctx.fillText('−cooling',pad.l+4,h-pad.b-4);
+  ylab(ctx,h,'Radiative forcing');
+}
+
+// ── SLIDE 6: GUEST ──
+function renderGuest(){
+  const tau=+document.getElementById('gu-s').value,r=+document.getElementById('gu-r').value;
+  const T=+document.getElementById('gu-h').value;
+  document.getElementById('gu-sv').textContent=tau+' yr';document.getElementById('gu-rv').textContent=r+' yr';
+  document.getElementById('gu-hv').textContent=T+' yr';
+  const fosA=fossilArea(T);
+  const bioA=integrate(t=>guestDecay(t,tau,r),0,T,200);
+  const gwp=fosA>0?bioA/fosA:0;
+  document.getElementById('gu-cf').textContent=gwp.toFixed(3);
+  document.getElementById('gu-cf').style.color=gwp<0.15?'var(--green)':gwp<0.5?'var(--amber)':'var(--coral)';
+  document.getElementById('gu-interp').textContent=gwp<0?'Net climate benefit — storage + fast regrowth outperform the fossil reference.':gwp<0.25?'Strong benefit: storage and rotation combine very effectively.':gwp<0.55?'Moderate benefit: longer storage or faster regrowth would help.':'Weak benefit: short storage or slow rotation limits the climate advantage.';
+  document.getElementById('gu-bv').textContent=fosA.toFixed(2);
+  document.getElementById('gu-gv').textContent=bioA.toFixed(2);
+  document.getElementById('gu-gb').style.width=fosA>0?Math.round(Math.min(1,Math.abs(bioA)/fosA)*100)+'%':'0%';
+
+  const cv=setupCanvas('gu-chart',240);if(!cv)return;
+  const{ctx,w,h}=cv;const pad={l:36,r:10,t:18,b:18};
+  ctx.clearRect(0,0,w,h);const z=axes(ctx,w,h,pad,true);const maxT=500,yMax=rfDecay(0)*1.15;
+  // fossil reference, solid filled area, cut off at the time horizon (matches Methods 2 & 3)
+  const fp=mkpts(t=>rfDecay(t),0,Math.min(T,maxT),maxT,pad,w,h,yMax,z,true);
+  fill(ctx,fp,z,'rgba(24,95,165,0.12)','rgba(24,95,165,0.6)');
+  // net biogenic curve: regrowth dip from 0→τ, an instantaneous +1 release pulse at τ, then
+  // combined fossil-style decay net of ongoing regrowth from τ→T (Guest et al. Fig. 1)
+  const Tc=Math.min(T,maxT),tauC=Math.min(tau,Tc);
+  const pre=mkpts(t=>-convGrowth(t,r),0,tauC,maxT,pad,w,h,yMax,z,true);
+  fill(ctx,pre,z,'rgba(8,80,65,0.15)','rgba(8,80,65,0.85)');
+  if(tau<Tc){
+    const post=mkpts(t=>guestDecay(t,tau,r),tauC,Tc,maxT,pad,w,h,yMax,z,true,160);
+    fill(ctx,post,z,'rgba(8,80,65,0.15)','rgba(8,80,65,0.85)');
+    if(pre.length&&post.length){
+      ctx.save();ctx.strokeStyle='rgba(8,80,65,0.85)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(pre[pre.length-1].x,pre[pre.length-1].y);ctx.lineTo(post[0].x,post[0].y);ctx.stroke();
+      ctx.restore();
+    }
+  }
+  const hX=pad.l+(w-pad.l-pad.r)*Tc/maxT;
+  dash(ctx,hX,pad.t,hX,h-pad.b);
+  ctx.save();ctx.fillStyle='rgba(180,180,180,0.10)';ctx.fillRect(hX,pad.t,w-pad.r-hX,h-pad.b-pad.t);ctx.restore();
+  ctx.fillStyle='rgba(128,128,128,0.7)';ctx.font='9px sans-serif';ctx.fillText('T='+T,hX+3,pad.t+10);
+  if(tau<=Tc){
+    const tX=pad.l+(w-pad.l-pad.r)*tauC/maxT;
+    dash(ctx,tX,pad.t,tX,h-pad.b,'rgba(8,80,65,0.5)');
+    ctx.fillStyle='rgba(8,80,65,0.8)';ctx.font='9px sans-serif';ctx.fillText('τ='+tau,tX+2,pad.t+10);
+  }
+  ctx.fillStyle='rgba(128,128,128,0.5)';ctx.font='9px sans-serif';ctx.fillText('+warming',pad.l+4,pad.t+12);ctx.fillText('−cooling',pad.l+4,h-pad.b-4);
+  ylab(ctx,h,'Radiative forcing');
+}
+
+// ── SLIDE 7: COMPARISON ──
+function renderComparison(){
+  const life=+document.getElementById('comp-l').value;
+  document.getElementById('comp-lv').textContent=life+' yr';
+  const T=100;
+  const dynV=-1+getDCF(Math.min(life,99),T);
+  const chTi=gwpCherubini(100,T),chHe=gwpCherubini(1,T);
+  const guTi=gwpGuest(life,100,T),guHe=gwpGuest(life,1,T);
+  const all=[0,dynV,chTi,chHe,guTi,guHe];
+  const range=Math.max(Math.abs(Math.min(...all)),Math.abs(Math.max(...all)),0.05);
+  const methods=['Static −1/+1','Dynamic LCA','GWP_bio Cherubini','GWP_bio Guest'];
+  const colors=['#888780','#185FA5','#BA7517','#1D9E75'];
+  function bars(id,vals){
+    document.getElementById(id).innerHTML=methods.map((m,i)=>{
+      const v=vals[i];
+      const np=v<0?Math.round((Math.abs(v)/range)*48):0;
+      const pp=v>0?Math.round((v/range)*48):0;
+      const vc=v<-0.01?'var(--green-dark)':v>0.01?'var(--coral-dark)':'var(--gray)';
+      const nf=v<-0.01?colors[i]:'rgba(128,128,128,0.15)';
+      const pf=v>0.01?'rgba(216,90,48,0.35)':'rgba(128,128,128,0.1)';
+      return`<div class="cbar-row"><span class="cbar-method">${m}</span><div class="cbar-center"><div class="cbar-zero"></div><div class="cbar-neg" style="width:${np}%;background:${nf}"></div><div class="cbar-pos" style="width:${pp}%;background:${pf}"></div></div><span class="cbar-val" style="color:${vc}">${v===0?'0':v.toFixed(3)}</span></div>`;
+    }).join('');
+  }
+  bars('comp-timber',[0,dynV,chTi,guTi]);
+  bars('comp-hemp',[0,dynV,chHe,guHe]);
+  document.getElementById('comp-insight').textContent=
+    life<25?`At ${life} years, storage is short — even time-sensitive methods give modest credit. Hemp's fast rotation helps it under GWP_bio Guest, but neither earns dramatic benefit yet.`:
+    life>=75?`At ${life} years, long storage strongly rewards both materials. Hemp's 1-year rotation still gives it a decisive edge — long storage plus fast regrowth is the ideal scenario.`:
+    `At ${life} years, the choice of method makes a striking difference. Static awards zero credit to both. GWP_bio Guest gives hemp a substantially better score than timber — fast rotation plus ${life}-year storage is hard to beat.`;
+}
+
+function renderCurrent(){
+  if(cur===2)renderRF();
+  if(cur===3)renderDynamic();
+  if(cur===4)renderCherubini();
+  if(cur===5)renderGuest();
+  if(cur===6)renderComparison();
+}
+
+document.getElementById('dyn-s').addEventListener('input',renderDynamic);
+document.getElementById('dyn-h').addEventListener('input',renderDynamic);
+document.getElementById('ch-r').addEventListener('input',renderCherubini);
+document.getElementById('ch-h').addEventListener('input',renderCherubini);
+document.getElementById('gu-s').addEventListener('input',renderGuest);
+document.getElementById('gu-r').addEventListener('input',renderGuest);
+document.getElementById('gu-h').addEventListener('input',renderGuest);
+document.getElementById('comp-l').addEventListener('input',renderComparison);
+
+window.addEventListener('resize',()=>renderCurrent());
+
+buildNav();
+goTo(0);
+</script>
+
+</body>
+</html>
