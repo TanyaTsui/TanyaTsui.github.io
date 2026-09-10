@@ -119,6 +119,19 @@ p{font-size:13px;color:var(--text-secondary);margin-bottom:.5rem;line-height:1.5
   .two-col,.three-col{grid-template-columns:1fr}
   .timeline{flex-direction:column}
   .tl-item:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-8px}
+  canvas{max-width:100%}
+  .topnav{gap:3px}
+  .slide-lbl{display:none}
+  .pip{flex:1;min-width:16px;width:auto}
+  .menu-wrap{margin-left:0;margin-top:.3rem;width:100%}
+  .menu-btn{width:100%}
+  .menu-list{left:0;right:auto;width:100%}
+  .slider-row{flex-wrap:wrap}
+  .slider-row label{flex:1 1 100%;min-width:0}
+  .cbar-row{flex-wrap:wrap}
+  .cbar-method{flex:1 1 100%;min-width:0;margin-bottom:2px}
+  .area-bar-row{flex-wrap:wrap}
+  .area-bar-label{flex:1 1 100%;min-width:0}
 }
 </style>
 </head>
@@ -486,8 +499,9 @@ function gwpGuest(tau,r,T=100){
 function setupCanvas(id,h){
   const c=document.getElementById(id);if(!c)return null;
   const dpr=window.devicePixelRatio||1;
-  const totalW=stableWidth();
-  const w=Math.floor(totalW/2)-20;
+  // size to the actual container: one grid column on desktop, full width on mobile
+  const pw=c.parentElement&&c.parentElement.clientWidth;
+  const w=Math.floor(pw>0?pw:stableWidth()/2-20);
   if(w<50)return null;
   c.style.width=w+'px';c.style.height=h+'px';
   c.width=w*dpr;c.height=h*dpr;
@@ -497,7 +511,8 @@ function setupCanvas(id,h){
 function setupCanvasFull(id,h){
   const c=document.getElementById(id);if(!c)return null;
   const dpr=window.devicePixelRatio||1;
-  const w=Math.min(Math.floor(stableWidth()),520);
+  const pw=c.parentElement&&c.parentElement.clientWidth;
+  const w=Math.min(Math.floor(pw>0?pw:stableWidth()),520);
   if(w<50)return null;
   c.style.width=w+'px';c.style.height=h+'px';
   c.width=w*dpr;c.height=h*dpr;
