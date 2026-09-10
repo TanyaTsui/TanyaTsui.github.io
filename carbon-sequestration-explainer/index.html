@@ -166,29 +166,51 @@ p{font-size:13px;color:var(--text-secondary);margin-bottom:.5rem;line-height:1.5
 <!-- 3 RF EXPLAINER -->
 <div class="slide">
   <div class="eyebrow">Background concept</div>
-  <h2>How do we measure the warming effect of a CO₂ emission?</h2>
-  <p class="lead">Before we get to Methods 2, 3, and 4, we need one shared concept — they all boil down to comparing areas under decay curves like the one below. When CO₂ is released, it doesn't cause warming all at once — it traps heat gradually, over decades. Scientists measure this using <strong>radiative forcing</strong>: the extra heat trapped by CO₂ in the atmosphere at any given moment.</p>
+  <h2>How do we account for carbon sequestration over time?</h2>
+  <p class="lead">Before we get to Methods 2, 3, and 4, we need one shared concept: how scientists measure the warming effect of a CO₂ emission over time.</p>
+  <p>When CO₂ is released, it doesn't cause warming all at once — it traps heat gradually, over decades. Scientists measure this using <strong>radiative forcing</strong>: the extra heat trapped by CO₂ in the atmosphere at any given moment.</p>
   <p>CO₂ doesn't stay in the atmosphere forever. Over time it gets absorbed by oceans and plants, and its warming effect fades — giving us a <strong>decay curve</strong>.</p>
   <div class="callout blue">The <strong>total warming caused by an emission</strong> is the sum of all radiative forcing it causes over time — the <strong>shaded area under the decay curve</strong>. A bigger area = more total warming.</div>
-  <canvas id="rf-chart" height="180" style="max-width:520px;margin:.75rem 0"></canvas>
+  <canvas id="rf-chart" height="170" style="max-width:520px;margin:.75rem 0"></canvas>
   <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);max-width:520px"><span>Year 0 (emission)</span><span>Year 500</span></div>
-  <div class="legend" style="margin-top:.5rem">
-    <div class="legend-item"><div style="width:12px;height:10px;background:rgba(24,95,165,0.2);border-radius:2px;flex-shrink:0"></div>total warming = area under curve</div>
-    <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.8)"></div>radiative forcing (warming per year)</div>
+
+  <h3 style="margin-top:.9rem">Biomass changes the shape of this curve</h3>
+  <p>For a plain fossil emission, the curve above is the whole story. Biomass carbon is different — it can be delayed and reabsorbed before it ever really "counts," which reshapes the curve entirely. Two things drive that reshaping:</p>
+  <div class="two-col" style="margin:.5rem 0">
+    <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
+      <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:.25rem">🏗️ Storage period</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">How long the carbon stays locked in the product before it's released at end of life.</div>
+    </div>
+    <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
+      <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:.25rem">🌱 Rotation period</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">How long it takes the harvested plant (or its replacement) to grow back.</div>
+    </div>
   </div>
-  <p style="margin-top:.6rem">This "compare the areas under two decay curves" idea is the foundation for the three accounting methods that follow — each one keeps this same logic, but changes exactly <em>what</em> gets compared to what, and that's what makes them disagree with each other:</p>
+  <p>Delay the release, and less of the curve falls inside any fixed time window. Speed up regrowth, and the released carbon gets reabsorbed sooner. Either way, "our scenario" ends up with a smaller curve than a plain fossil emission's.</p>
+
+  <h3 style="margin-top:.9rem">Every method computes the same ratio</h3>
+  <p>This is the idea every method that follows is built on: draw a blue curve for the fossil reference (no storage, no regrowth) and a green curve for our actual biomass scenario — then compare the two shaded areas.</p>
+  <canvas id="rf-chart2" height="200" style="max-width:520px;margin:.75rem 0"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);max-width:520px"><span>Year 0</span><span>Year 500</span></div>
+  <div class="legend" style="margin-top:.5rem">
+    <div class="legend-item"><div class="legend-sw" style="background:rgba(24,95,165,0.8)"></div>reference: a plain fossil emission (blue)</div>
+    <div class="legend-item"><div class="legend-sw" style="background:var(--green-dark)"></div>our scenario: the biomass being studied (green)</div>
+  </div>
+  <div class="callout green" style="margin-top:.5rem"><strong>green area ÷ blue area.</strong> Below 1, our scenario caused less total warming than the fossil reference — a climate benefit. The three methods that follow never disagree about this ratio idea itself. What they disagree about is the <em>shape of the green curve</em> — how storage and rotation are each assumed to reshape it.</div>
+
+  <p style="margin-top:.6rem">Concretely, here's what each method's green curve accounts for:</p>
   <div class="three-col" style="margin-top:.4rem">
     <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
       <div style="font-size:11px;font-weight:600;color:var(--blue-mid);margin-bottom:.25rem">Method 2 · Dynamic LCA</div>
-      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>storage period</strong> — how long carbon sits in the product before release.</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Green curve accounts for <strong>storage period</strong> — it doesn't start until the stored carbon is released.</div>
     </div>
     <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
       <div style="font-size:11px;font-weight:600;color:var(--green-dark);margin-bottom:.25rem">Method 3 · Cherubini et al.</div>
-      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>rotation period</strong> — how fast the harvested plant regrows.</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Green curve accounts for <strong>rotation period</strong> — regrowth pulls it down as the replacement plant grows back.</div>
     </div>
     <div class="mini-card" style="text-align:left;padding:.6rem .7rem">
       <div style="font-size:11px;font-weight:600;color:var(--coral-dark);margin-bottom:.25rem">Method 4 · Guest et al.</div>
-      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Accounts for <strong>both</strong> storage period and rotation period together.</div>
+      <div style="font-size:10px;color:var(--text-secondary);line-height:1.4">Green curve accounts for <strong>both</strong> — regrowth <em>and</em> a delayed release, combined.</div>
     </div>
   </div>
 </div>
@@ -517,7 +539,7 @@ function ylab(ctx,h,txt){
 
 // ── SLIDE 3: RF (static) ──
 function renderRF(){
-  const cv=setupCanvasFull('rf-chart',180);if(!cv)return;
+  const cv=setupCanvasFull('rf-chart',170);if(!cv)return;
   const{ctx,w,h}=cv;const pad={l:36,r:10,t:12,b:18};
   ctx.clearRect(0,0,w,h);
   const z=axes(ctx,w,h,pad,false);
@@ -525,6 +547,25 @@ function renderRF(){
   fill(ctx,mkpts(t=>rfDecay(t),0,maxT,maxT,pad,w,h,yMax,z,false),z,'rgba(24,95,165,0.18)','rgba(24,95,165,0.8)');
   ctx.fillStyle='rgba(24,95,165,0.6)';ctx.font='10px sans-serif';
   ctx.fillText('total warming = area under curve',pad.l+10,pad.t+18);
+  ylab(ctx,h,'Radiative forcing');
+}
+function renderRF2(){
+  const cv=setupCanvasFull('rf-chart2',200);if(!cv)return;
+  const{ctx,w,h}=cv;const pad={l:36,r:10,t:14,b:18};
+  ctx.clearRect(0,0,w,h);
+  const z=axes(ctx,w,h,pad,false);
+  const maxT=500,yMax=rfDecay(0)*1.15,delay=120;
+  // reference: a plain fossil emission at year 0
+  fill(ctx,mkpts(t=>rfDecay(t),0,maxT,maxT,pad,w,h,yMax,z,false),z,'rgba(24,95,165,0.14)','rgba(24,95,165,0.8)');
+  // our scenario: illustrative delayed/reshaped release — the real methods each give this a different shape
+  fill(ctx,mkpts(t=>rfDecay(t-delay),0,maxT,maxT,pad,w,h,yMax,z,false),z,'rgba(8,80,65,0.18)','rgba(8,80,65,0.85)');
+  const refA=integrate(t=>rfDecay(t),0,maxT),ourA=integrate(t=>rfDecay(t-delay),delay,maxT);
+  ctx.fillStyle='rgba(24,95,165,0.75)';ctx.font='10px sans-serif';
+  ctx.fillText('reference (blue)',pad.l+70,pad.t+14);
+  ctx.fillStyle='rgba(8,80,65,0.9)';ctx.font='10px sans-serif';
+  ctx.fillText('our scenario (green)',pad.l+70,h-pad.b-8);
+  ctx.fillStyle='rgba(90,88,82,0.85)';ctx.font='10px sans-serif';
+  ctx.fillText('ratio = green ÷ blue ≈ '+(ourA/refA).toFixed(2),w-pad.r-160,pad.t+14);
   ylab(ctx,h,'Radiative forcing');
 }
 
@@ -688,7 +729,7 @@ function renderComparison(){
 }
 
 function renderCurrent(){
-  if(cur===2)renderRF();
+  if(cur===2){renderRF();renderRF2();}
   if(cur===3)renderDynamic();
   if(cur===4)renderCherubini();
   if(cur===5)renderGuest();
