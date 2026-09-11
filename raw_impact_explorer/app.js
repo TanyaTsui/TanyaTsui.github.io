@@ -24,12 +24,20 @@ function defaultSourceFor(material) {
 // calc.js / eolConstants / benefitParams look up — only the shown text changes.
 const DISPLAY_LABELS = { "Soft wood": "wood, soft", "Hard wood": "wood, hard", "co-product": "by-product" };
 function disp(v) { return DISPLAY_LABELS[v] !== undefined ? DISPLAY_LABELS[v] : v; }
+// Throughput rate is calculated from user-entered material loading & process time per
+// batch, rather than typed in directly — see computeProcessBurdens in calc.js.
+function computedRateKgHr(step) {
+  return step.batchProcessTimeHrs ? step.batchMaterialKg / step.batchProcessTimeHrs : 0;
+}
 
 // ---------- blank (starting) scenario — the tool opens empty; worked examples
 // live in presets.js and are loaded via "Load a case" ---------------------------
 function blankScenario() {
   return {
     productKg: 1.0,
+    // Single electricity location for the whole scenario, set once here and used for
+    // every process step (production, repair) and for end-of-life disposal.
+    elecLoc: "NL",
     productionBom: [],
     productionChain: [],
     repair: {
@@ -43,7 +51,6 @@ function blankScenario() {
     repairChain: [],
     eol: {
       composted: 0, recycledOpen: 0, recycledClosed: 0, incinerated: 0, landfilled: 0,
-      disposalElecLoc: "NL",
     },
   };
 }
@@ -52,7 +59,7 @@ function isBlankScenario(s) {
     && s.repairBom.length === 0 && s.repairChain.length === 0;
 }
 function emptyStep(name) {
-  return { name: name || "New step", kgMachine: 50, powerKW: 1.0, rateKgHr: 5.0, lifetimeHrs: 15000, elecLoc: "NL", retainedPct: 95, machineSource: "virgin" };
+  return { name: name || "New step", kgMachine: 50, powerKW: 1.0, batchMaterialKg: 5.0, batchProcessTimeHrs: 1.0, lifetimeHrs: 15000, retainedPct: 95, machineSource: "virgin" };
 }
 function emptyBomItem() {
   const m = Object.keys(RAW_DATA.bomMaterials)[0];
@@ -154,10 +161,11 @@ function renderChainSection(scKey, chainKey, title, hint) {
         ${fieldSelect("Machine source", step.machineSource, `${scKey}.${chainKey}.${i}.machineSource`, ["virgin", "recycled"])}
         ${fieldNum("Machine lifetime", step.lifetimeHrs, `${scKey}.${chainKey}.${i}.lifetimeHrs`, { unit: "hrs" })}
         ${fieldNum("Power draw", step.powerKW, `${scKey}.${chainKey}.${i}.powerKW`, { unit: "kW" })}
-        ${fieldSelect("Electricity location", step.elecLoc, `${scKey}.${chainKey}.${i}.elecLoc`, RAW_DATA.locations)}
-        ${fieldNum("Throughput rate", step.rateKgHr, `${scKey}.${chainKey}.${i}.rateKgHr`, { unit: "kg/hr" })}
+        ${fieldNum("Material loading per batch", step.batchMaterialKg, `${scKey}.${chainKey}.${i}.batchMaterialKg`, { unit: "kg" })}
+        ${fieldNum("Process time per batch", step.batchProcessTimeHrs, `${scKey}.${chainKey}.${i}.batchProcessTimeHrs`, { unit: "hrs" })}
         ${fieldNum("Mass retained after step", step.retainedPct, `${scKey}.${chainKey}.${i}.retainedPct`, { unit: "%", step: "0.1" })}
       </div>
+      <div class="section-note" style="margin:8px 0 0;" id="rate-${scKey}-${chainKey}-${i}">Throughput rate (calculated): ${fmt(computedRateKgHr(step), 2)} kg/hr</div>
     </div>`;
     const connector = i < chain.length ? `<div class="flow-connector"><div class="line"></div><span class="arrow">&darr;</span>
       <span class="pct-pill" id="pill-${scKey}-${chainKey}-${i}">${step.retainedPct}% carries to next step</span></div>` : "";
@@ -243,10 +251,11 @@ function renderChainSectionInner(scKey, chainKey, title) {
         ${fieldSelect("Machine source", step.machineSource, `${scKey}.${chainKey}.${i}.machineSource`, ["virgin", "recycled"])}
         ${fieldNum("Machine lifetime", step.lifetimeHrs, `${scKey}.${chainKey}.${i}.lifetimeHrs`, { unit: "hrs" })}
         ${fieldNum("Power draw", step.powerKW, `${scKey}.${chainKey}.${i}.powerKW`, { unit: "kW" })}
-        ${fieldSelect("Electricity location", step.elecLoc, `${scKey}.${chainKey}.${i}.elecLoc`, RAW_DATA.locations)}
-        ${fieldNum("Throughput rate", step.rateKgHr, `${scKey}.${chainKey}.${i}.rateKgHr`, { unit: "kg/hr" })}
+        ${fieldNum("Material loading per batch", step.batchMaterialKg, `${scKey}.${chainKey}.${i}.batchMaterialKg`, { unit: "kg" })}
+        ${fieldNum("Process time per batch", step.batchProcessTimeHrs, `${scKey}.${chainKey}.${i}.batchProcessTimeHrs`, { unit: "hrs" })}
         ${fieldNum("Mass retained after step", step.retainedPct, `${scKey}.${chainKey}.${i}.retainedPct`, { unit: "%", step: "0.1" })}
       </div>
+      <div class="section-note" style="margin:8px 0 0;" id="rate-${scKey}-${chainKey}-${i}">Throughput rate (calculated): ${fmt(computedRateKgHr(step), 2)} kg/hr</div>
     </div>`;
     const connector = i < chain.length - 1 ? `<div class="flow-connector"><div class="line"></div><span class="arrow">&darr;</span>
       <span class="pct-pill" id="pill-${scKey}-${chainKey}-${i}">${step.retainedPct}% carries to next step</span></div>` : "";
@@ -269,14 +278,13 @@ function renderEolSection(scKey) {
       <h3>End of life</h3>
       <span class="bom-total-badge ${badgeClass}" id="badge-${scKey}-eol">${total.toFixed(1)}%</span>
     </div>
-    <p class="section-note">How the product (and any repair off-cuts) is disposed of at end of life. Shares should sum to 100%.</p>
+    <p class="section-note">How the product (and any repair off-cuts) is disposed of at end of life. Shares should sum to 100%. Disposal electricity use is calculated at the scenario's electricity location, set in Product basis.</p>
     <div class="field-grid">
       ${fieldNum("Composted", e.composted, `${scKey}.eol.composted`, { unit: "%", step: "0.1" })}
       ${fieldNum("Recycled (open loop)", e.recycledOpen, `${scKey}.eol.recycledOpen`, { unit: "%", step: "0.1" })}
       ${fieldNum("Recycled (closed loop)", e.recycledClosed, `${scKey}.eol.recycledClosed`, { unit: "%", step: "0.1" })}
       ${fieldNum("Incinerated", e.incinerated, `${scKey}.eol.incinerated`, { unit: "%", step: "0.1" })}
       ${fieldNum("Landfilled", e.landfilled, `${scKey}.eol.landfilled`, { unit: "%", step: "0.1" })}
-      ${fieldSelect("Disposal grid location", e.disposalElecLoc, `${scKey}.eol.disposalElecLoc`, RAW_DATA.locations, { wide: true })}
     </div>
   </div>`;
 }
@@ -296,9 +304,9 @@ function renderScenarioEditor(scKey) {
   if (!scenario) {
     return `<div class="panel panel-pad">
       <div class="empty-state">
-        <h3 style="color:var(--ink);">No future scenario yet</h3>
-        <p style="margin-top:8px;font-size:12.5px;">Start from today's numbers, then change whatever you think you can optimise. The Compare tab will pick up exactly what's different.</p>
-        <button class="btn btn-primary" id="btn-copy-a-to-b">Copy today's numbers &rarr;</button>
+        <h3 style="color:var(--ink);">No scaled up scenario yet</h3>
+        <p style="margin-top:8px;font-size:12.5px;">Start from the prototype's numbers, then change whatever you think you can optimise. The Compare tab will pick up exactly what's different.</p>
+        <button class="btn btn-primary" id="btn-copy-a-to-b">Copy prototype's numbers &rarr;</button>
       </div>
     </div>`;
   }
@@ -311,9 +319,10 @@ function renderScenarioEditor(scKey) {
         <label class="toggle-row"><span class="switch"><input type="checkbox" ${repairOn ? "checked" : ""} data-action="toggle-repair" data-sc="${scKey}"><span class="slider"></span></span>
         <span class="hint">${repairOn ? "repair included" : "repair not included"}</span></label>
       </div>
-      <p class="section-note">Lifetime assumptions set how long biogenic carbon is considered stored${repairOn ? ", and how many repair cycles are added" : ""}.</p>
+      <p class="section-note">Lifetime assumptions set how long biogenic carbon is considered stored${repairOn ? ", and how many repair cycles are added" : ""}. Electricity location applies to every process step (production, repair) and to end-of-life disposal.</p>
       <div class="field-grid">
         ${fieldNum("Target output mass", scenario.productKg, `${scKey}.productKg`, { unit: "kg", step: "0.01" })}
+        ${fieldSelect("Electricity location", scenario.elecLoc, `${scKey}.elecLoc`, RAW_DATA.locations)}
         ${fieldNum("Expected lifetime without repair", scenario.repair.expectedLifetimeYr, `${scKey}.repair.expectedLifetimeYr`, { unit: "yr" })}
         ${repairOn ? fieldNum("Lifetime extension per repair", scenario.repair.extensionPerRepairYr, `${scKey}.repair.extensionPerRepairYr`, { unit: "yr" }) : ""}
         ${repairOn ? fieldNum("Number of repair events", scenario.repair.numRepairs, `${scKey}.repair.numRepairs`, { unit: "" }) : ""}
@@ -347,9 +356,12 @@ function buildDiffs(A, B) {
   }
 
   addSlider("Target output mass", "Product basis", A.productKg, B.productKg, "kg", (c, t) => { c.productKg = lerp(A.productKg, B.productKg, t); });
+  addToggle("Electricity location", "Product basis", A.elecLoc, B.elecLoc, (c, t) => {
+    c.elecLoc = t >= 0.5 ? B.elecLoc : A.elecLoc;
+  });
 
-  // One mix slider per BOM: slides the whole bill of materials from Today's mix to
-  // Future's mix (per-material % lerped, sources switch at the halfway point).
+  // One mix slider per BOM: slides the whole bill of materials from the prototype's mix to
+  // the scaled up scenario's mix (per-material % lerped, sources switch at the halfway point).
   function diffBom(bomKey, groupLabel) {
     const bomA = A[bomKey], bomB = B[bomKey];
     const names = Array.from(new Set([...bomA.map(x => x.material), ...bomB.map(x => x.material)]));
@@ -360,7 +372,7 @@ function buildDiffs(A, B) {
     if (!changed) return;
     diffs.push({
       id: diffId(groupLabel, "mix"), type: "slider",
-      label: `${groupLabel}: Today mix → Future mix`, group: groupLabel,
+      label: `${groupLabel}: Prototype mix → Scaled-up mix`, group: groupLabel,
       a: 0, b: 100, unit: "%", order: 1, isMix: true,
       apply: (c, t) => {
         for (const name of names) {
@@ -392,7 +404,8 @@ function buildDiffs(A, B) {
       if (sa && sb) {
         const numFields = [
           ["kgMachine", "machine mass", "kg"], ["powerKW", "power draw", "kW"],
-          ["rateKgHr", "throughput", "kg/hr"], ["lifetimeHrs", "machine lifetime", "hrs"],
+          ["batchMaterialKg", "material loading per batch", "kg"], ["batchProcessTimeHrs", "process time per batch", "hrs"],
+          ["lifetimeHrs", "machine lifetime", "hrs"],
           ["retainedPct", "mass retained", "%"],
         ];
         for (const [f, label, unit] of numFields) {
@@ -405,13 +418,9 @@ function buildDiffs(A, B) {
           const st = c[chainKey].find(s => s.name === name);
           if (st) st.machineSource = t >= 0.5 ? sb.machineSource : sa.machineSource;
         });
-        addToggle(`${name} — electricity location`, groupLabel, sa.elecLoc, sb.elecLoc, (c, t) => {
-          const st = c[chainKey].find(s => s.name === name);
-          if (st) st.elecLoc = t >= 0.5 ? sb.elecLoc : sa.elecLoc;
-        });
       } else {
         const existsA = !!sa, existsB = !!sb;
-        addToggle(`${name} — step ${existsA ? "removed" : "added"} in Future scenario`, groupLabel, existsA, existsB, (c, t) => {
+        addToggle(`${name} — step ${existsA ? "removed" : "added"} in scaled up scenario`, groupLabel, existsA, existsB, (c, t) => {
           const should = t >= 0.5 ? existsB : existsA;
           const idx = c[chainKey].findIndex(s => s.name === name);
           if (should && idx === -1) c[chainKey].push(deepClone(sb || sa));
@@ -451,9 +460,6 @@ function buildDiffs(A, B) {
       isMix: true,
     });
   }
-  addToggle("Disposal electricity location", "End of life", eolA.disposalElecLoc, eolB.disposalElecLoc, (c, t) => {
-    c.eol.disposalElecLoc = t >= 0.5 ? eolB.disposalElecLoc : eolA.disposalElecLoc;
-  });
 
   return diffs;
 }
@@ -473,7 +479,7 @@ function renderCompare() {
   if (!B) {
     return `<div class="panel"><div class="compare-empty">
       <h3 style="color:var(--ink);margin-bottom:8px;">Nothing to compare yet</h3>
-      <p style="font-size:12.5px;">Build a Future scenario first — the Compare tab will detect exactly what you changed and let you slide between the two.</p>
+      <p style="font-size:12.5px;">Build a scaled up scenario first — the Compare tab will detect exactly what you changed and let you slide between the two.</p>
     </div></div>`;
   }
   state.compareDiffs = buildDiffs(A, B);
@@ -482,8 +488,8 @@ function renderCompare() {
 
   if (diffs.length === 0) {
     return `<div class="panel"><div class="compare-empty">
-      <h3 style="color:var(--ink);margin-bottom:8px;">Today and Future are identical</h3>
-      <p style="font-size:12.5px;">Change something in the Future scenario tab to see sliders here.</p>
+      <h3 style="color:var(--ink);margin-bottom:8px;">Prototype and scaled up scenario are identical</h3>
+      <p style="font-size:12.5px;">Change something in the Scaled up scenario tab to see sliders here.</p>
     </div></div>`;
   }
 
@@ -498,13 +504,13 @@ function renderCompare() {
         return `<div class="diff-card">
           <div class="diff-card-top"><span class="name">${d.label}</span></div>
           <div class="diff-toggle">
-            <button data-toggle="${d.id}" data-val="0" class="${!isB ? "active" : ""}">Today: ${d.a}</button>
-            <button data-toggle="${d.id}" data-val="100" class="${isB ? "active" : ""}">Future: ${d.b}</button>
+            <button data-toggle="${d.id}" data-val="0" class="${!isB ? "active" : ""}">Prototype: ${d.a}</button>
+            <button data-toggle="${d.id}" data-val="100" class="${isB ? "active" : ""}">Scaled-up: ${d.b}</button>
           </div>
         </div>`;
       }
-      const aLabel = d.isMix ? "Today mix" : fmt(d.a) + " " + (d.unit || "");
-      const bLabel = d.isMix ? "Future mix" : fmt(d.b) + " " + (d.unit || "");
+      const aLabel = d.isMix ? "Prototype mix" : fmt(d.a) + " " + (d.unit || "");
+      const bLabel = d.isMix ? "Scaled-up mix" : fmt(d.b) + " " + (d.unit || "");
       return `<div class="diff-card">
         <div class="diff-card-top"><span class="name">${d.label}</span><span class="delta mono" id="deltaval-${d.id}">${t}%</span></div>
         <div class="diff-vals"><span>${aLabel}</span><span>${bLabel}</span></div>
@@ -542,15 +548,15 @@ function renderCompare() {
     <div class="section-head" style="margin-bottom:14px;">
       <h3>What changed, and how much it matters</h3>
       <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm" id="btn-reset-compare">Reset to Today</button>
-        <button class="btn btn-sm" id="btn-apply-compare">Preview full Future</button>
+        <button class="btn btn-sm" id="btn-reset-compare">Reset to prototype</button>
+        <button class="btn btn-sm" id="btn-apply-compare">Preview full scaled up</button>
       </div>
     </div>
-    <p class="section-note" style="margin-bottom:14px;">The master slider moves every lever together, straight from Today to the full Future scenario. Each lever below also moves on its own — everything else stays put — to show how sensitive the result is to that one change.</p>
+    <p class="section-note" style="margin-bottom:14px;">The master slider moves every lever together, straight from the prototype to the full scaled up scenario. Each lever below also moves on its own — everything else stays put — to show how sensitive the result is to that one change.</p>
     <div class="diff-card" style="margin-bottom:20px;border-color:var(--rust);background:rgba(181,101,29,0.06);">
-      <div class="diff-card-top"><span class="name">Slide everything: Today → Future</span>
+      <div class="diff-card-top"><span class="name">Slide everything: Prototype → Scaled-up</span>
         <span class="delta mono" id="compare-master-label">${state.compareMasterT}%</span></div>
-      <div class="diff-vals"><span>Today (every lever)</span><span>Full Future scenario</span></div>
+      <div class="diff-vals"><span>Prototype (every lever)</span><span>Full scaled-up scenario</span></div>
       <input type="range" min="0" max="100" step="1" value="${state.compareMasterT}" class="diff-slider" id="compare-master">
     </div>
     <div style="margin-bottom:22px;">
@@ -846,6 +852,13 @@ function updateBadgesAndPills(path, scKey) {
     const pill = document.getElementById(`pill-${sc}-${chainKey}-${idx}`);
     if (pill) pill.textContent = `${val}% carries to next step`;
   }
+  const rateMatch = path.match(/^([AB])\.(productionChain|repairChain)\.(\d+)\.(batchMaterialKg|batchProcessTimeHrs)$/);
+  if (rateMatch) {
+    const [, sc, chainKey, idx] = rateMatch;
+    const step = state.scenarios[sc][chainKey][idx];
+    const rateEl = document.getElementById(`rate-${sc}-${chainKey}-${idx}`);
+    if (rateEl) rateEl.textContent = `Throughput rate (calculated): ${fmt(computedRateKgHr(step), 2)} kg/hr`;
+  }
 }
 
 function wireLeftEvents() {
@@ -1023,6 +1036,22 @@ function mergeScenario(raw) {
   for (const k of ["productionBom", "repairBom", "productionChain", "repairChain"]) {
     if (!Array.isArray(s[k])) s[k] = deepClone(def[k]);
   }
+  // Migrate older exports/presets: scenario used to carry a location per process step and
+  // a separate one for disposal, plus a directly-entered throughput rate. Fold those into
+  // the single scenario-level location, and derive material loading / process time (an
+  // arbitrary batch size that reproduces the same rate) if not already present.
+  if (raw.elecLoc === undefined) {
+    const fromStep = (raw.productionChain || [])[0] && (raw.productionChain || [])[0].elecLoc;
+    const fromEol = raw.eol && raw.eol.disposalElecLoc;
+    s.elecLoc = fromStep || fromEol || def.elecLoc;
+  }
+  for (const k of ["productionChain", "repairChain"]) {
+    s[k] = s[k].map(step => {
+      if (step.batchMaterialKg !== undefined && step.batchProcessTimeHrs !== undefined) return step;
+      const { rateKgHr, elecLoc, ...rest } = step;
+      return Object.assign({}, rest, { batchMaterialKg: rateKgHr || 5, batchProcessTimeHrs: 1 });
+    });
+  }
   return s;
 }
 function applyImportedPayload(data, srcLabel) {
@@ -1047,7 +1076,7 @@ function applyImportedPayload(data, srcLabel) {
   state.activeTab = "A";
   renderAll();
   const what = srcLabel ? `Loaded case: ${srcLabel}` : "Imported inputs from file";
-  setRecordStatus(what + (B ? " — Today + Future scenario." : "."), "ok");
+  setRecordStatus(what + (B ? " — Prototype + Scaled up scenario." : "."), "ok");
 }
 document.getElementById("btn-import").addEventListener("click", () => {
   document.getElementById("file-import").click();

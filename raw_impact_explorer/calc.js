@@ -102,7 +102,7 @@ function computeMaterialBurdens(bom, totalInputKg, background) {
   return { total, items };
 }
 
-function computeProcessBurdens(chain, targetOutputKg, background) {
+function computeProcessBurdens(chain, targetOutputKg, elecLoc, background) {
   const n = chain.length;
   const requiredInputKg = new Array(n);
   let nextRequired = targetOutputKg;
@@ -114,7 +114,13 @@ function computeProcessBurdens(chain, targetOutputKg, background) {
   const steps = [];
   for (let i = 0; i < n; i++) {
     const step = chain[i];
-    const processTimeHrs = requiredInputKg[i] / step.rateKgHr;
+    // Throughput rate (kg/hr) is derived from what the user actually enters — material
+    // loading per batch and process time per batch — rather than typed in directly.
+    // (Legacy `rateKgHr` is honoured as a fallback for older imported/preset data.)
+    const rateKgHr = (step.batchMaterialKg !== undefined && step.batchProcessTimeHrs)
+      ? step.batchMaterialKg / step.batchProcessTimeHrs
+      : step.rateKgHr;
+    const processTimeHrs = requiredInputKg[i] / rateKgHr;
     const machineWearKg = step.kgMachine * (processTimeHrs / step.lifetimeHrs);
     const energyUseKwh = step.powerKW * processTimeHrs;
     const machineBurden = scaleSeries(
@@ -122,14 +128,14 @@ function computeProcessBurdens(chain, targetOutputKg, background) {
       machineWearKg
     );
     const electricityBurden = scaleSeries(
-      getUnitBurden("energy use", { location: step.elecLoc }, background),
+      getUnitBurden("energy use", { location: elecLoc }, background),
       energyUseKwh
     );
     total = addSeries(addSeries(total, machineBurden), electricityBurden);
     steps.push({
       name: step.name,
       requiredInputKg: requiredInputKg[i],
-      processTimeHrs, machineWearKg, energyUseKwh,
+      rateKgHr, processTimeHrs, machineWearKg, energyUseKwh,
       machineBurden, electricityBurden,
       burden: addSeries(machineBurden, electricityBurden),
     });
@@ -248,8 +254,11 @@ function computeDelayedEmissionsCredit(bom, totalKg, storageYr) {
 // ============================================================================
 function runModel(scenario, background = NO_BACKGROUND) {
   const productKg = scenario.productKg;
+  // Single electricity location for the whole scenario — set once in Product basis and
+  // used for every process step (production, repair) and for end-of-life disposal.
+  const elecLoc = scenario.elecLoc;
 
-  const prod = computeProcessBurdens(scenario.productionChain, productKg, background);
+  const prod = computeProcessBurdens(scenario.productionChain, productKg, elecLoc, background);
   const totalMaterialInputKg = prod.firstRequiredInputKg;
   const materialRes = computeMaterialBurdens(scenario.productionBom, totalMaterialInputKg, background);
   const materialBurdens = materialRes.total;
@@ -265,7 +274,7 @@ function runModel(scenario, background = NO_BACKGROUND) {
 
   if (scenario.repair.enabled) {
     repairMaterialKg = (scenario.repair.repairMaterialPctOfProduct / 100) * productKg;
-    const rep = computeProcessBurdens(scenario.repairChain, repairMaterialKg, background);
+    const rep = computeProcessBurdens(scenario.repairChain, repairMaterialKg, elecLoc, background);
     repairMaterialInputKg = rep.firstRequiredInputKg;
     repairSteps = rep.steps;
     const repairMaterialRes = computeMaterialBurdens(scenario.repairBom, repairMaterialInputKg, background);
@@ -282,7 +291,7 @@ function runModel(scenario, background = NO_BACKGROUND) {
   const totalDisposedKg = productKg + repairMaterialKg * nRepairs;
   const { A: Aeol, Qs: QsEol, LHV } = getEolConstants("RAW product");
   const eolBurdens = computeEolBurdens(scenario.eol, totalDisposedKg, Aeol, background);
-  const eolBenefits = computeEolBenefits(scenario.eol, totalDisposedKg, Aeol, QsEol, LHV, scenario.eol.disposalElecLoc, background);
+  const eolBenefits = computeEolBenefits(scenario.eol, totalDisposedKg, Aeol, QsEol, LHV, elecLoc, background);
 
   const prodSeq = computeSequestrationCredit(scenario.productionBom, totalMaterialInputKg, productionStorageYr);
   const prodDelay = computeDelayedEmissionsCredit(scenario.productionBom, totalMaterialInputKg, productionStorageYr);
