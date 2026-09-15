@@ -73,6 +73,10 @@ const state = {
   scenarios: { A: blankScenario(), B: null },
   activeTab: "A",
   category: "climate change",
+  // How results are normalised: "perKg" divides every impact number by the scenario's
+  // target output mass (Product basis → Target output mass); "total" shows the impact
+  // of the whole product as modelled.
+  resultsMode: "perKg",
   compareDiffs: [],
   compareT: {}, // diffId -> 0..100
   compareMasterT: 0, // master "slide everything" position
@@ -522,12 +526,12 @@ function renderCompare() {
 
   // ranked drivers: hold everything at 0 except one diff at 100, measure delta in the active category
   const catKey = state.category;
-  const baseline = runModel(previewScenario(A, diffs, Object.fromEntries(diffs.map(d => [d.id, 0]))), state.background);
+  const baseline = displayResult(runModel(previewScenario(A, diffs, Object.fromEntries(diffs.map(d => [d.id, 0]))), state.background), state.resultsMode);
   const baseNet = baseline.net[catKey];
   const driverRows = diffs.map(d => {
     const tMap = Object.fromEntries(diffs.map(x => [x.id, 0]));
     tMap[d.id] = 100;
-    const res = runModel(previewScenario(A, diffs, tMap), state.background);
+    const res = displayResult(runModel(previewScenario(A, diffs, tMap), state.background), state.resultsMode);
     const delta = res.net[catKey] - baseNet;
     return { label: d.label, delta };
   }).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 8);
@@ -580,6 +584,46 @@ function currentPreviewResult() {
   return runModel(scenario, state.background);
 }
 
+// ---------- per-kg / whole-product normalisation of a runModel() result -------------
+function scaleSeriesForDisplay(s, factor) {
+  const out = {};
+  for (const k in s) out[k] = s[k] * factor;
+  return out;
+}
+// Returns `result` unchanged for "total" mode; for "perKg" mode, divides every impact
+// number (burdens, credits, net, and all itemised sub-breakdowns) by the scenario's
+// target output mass. Mass fields themselves (kg, hrs, counts, ...) are left untouched.
+function displayResult(result, mode) {
+  const productKg = result.scenario.productKg;
+  const denom = (mode === "perKg" && productKg > 1e-9) ? productKg : 1;
+  if (denom === 1) return result;
+  const f = 1 / denom;
+  const r = Object.assign({}, result);
+  r.materialBurdens = scaleSeriesForDisplay(result.materialBurdens, f);
+  r.productionBurdens = scaleSeriesForDisplay(result.productionBurdens, f);
+  r.repairBurdens = scaleSeriesForDisplay(result.repairBurdens, f);
+  r.eolBurdens = scaleSeriesForDisplay(result.eolBurdens, f);
+  r.totalBurdens = scaleSeriesForDisplay(result.totalBurdens, f);
+  r.seqTotal = scaleSeriesForDisplay(result.seqTotal, f);
+  r.eolBenefits = scaleSeriesForDisplay(result.eolBenefits, f);
+  r.net = scaleSeriesForDisplay(result.net, f);
+  r.seqGrowth = result.seqGrowth * f;
+  r.seqAvoided = result.seqAvoided * f;
+  const scaleItems = (items) => (items || []).map(it => Object.assign({}, it, { burden: scaleSeriesForDisplay(it.burden, f) }));
+  r.materialItems = scaleItems(result.materialItems);
+  r.repairMaterialItems = scaleItems(result.repairMaterialItems);
+  r.productionSteps = scaleItems(result.productionSteps);
+  r.repairSteps = scaleItems(result.repairSteps);
+  const scaleBreakdown = (bd) => {
+    const out = {};
+    for (const k in bd) out[k] = scaleSeriesForDisplay(bd[k], f);
+    return out;
+  };
+  r.eolBurdensBreakdown = scaleBreakdown(result.eolBurdensBreakdown || {});
+  r.eolBenefitsBreakdown = scaleBreakdown(result.eolBenefitsBreakdown || {});
+  return r;
+}
+
 // Split in two so the background slider (rendered in renderResultsControls) never gets
 // destroyed mid-drag: its own `input` handler only re-renders renderResultsBody(), never
 // renderResultsControls() — same principle as the existing diff-sliders, which live in
@@ -587,6 +631,12 @@ function currentPreviewResult() {
 function renderResultsControls() {
   const cat = state.category;
   const catOptions = CATEGORIES.map(c => `<option value="${c}" ${c === cat ? "selected" : ""}>${c}</option>`).join("");
+
+  const modeControl = `
+    <div class="diff-toggle" style="margin-top:12px;">
+      <button data-action="set-results-mode" data-mode="perKg" class="${state.resultsMode === "perKg" ? "active" : ""}">Per kg of product</button>
+      <button data-action="set-results-mode" data-mode="total" class="${state.resultsMode === "total" ? "active" : ""}">Whole product</button>
+    </div>`;
 
   const bg = state.background;
   const scenarioOptions = FUTURE_SCENARIOS.map(s => `<option value="${s}" ${s === bg.scenarioLabel ? "selected" : ""}>${s}</option>`).join("");
@@ -608,12 +658,13 @@ function renderResultsControls() {
       <h3 style="color:var(--ink);">Impact result</h3>
       <select class="cat-select" id="category-select">${catOptions}</select>
     </div>
+    ${modeControl}
     ${backgroundControl}
   `;
 }
 
 function renderResultsBody() {
-  const result = currentPreviewResult();
+  const result = displayResult(currentPreviewResult(), state.resultsMode);
   const cat = state.category;
   const netVal = result.net[cat];
   const burdenVal = result.totalBurdens[cat];
@@ -723,9 +774,12 @@ function renderResultsBody() {
       </div>`;
     }).join("");
 
+  const modeLabel = state.resultsMode === "perKg"
+    ? `per kg of product (target output mass ${fmt(result.scenario.productKg, 3)} kg)`
+    : `for the whole product (${fmt(result.scenario.productKg, 3)} kg target output mass)`;
   return `
     <div class="net-number ${netVal <= 0 ? "negative" : "positive"}">${fmt(netVal)}<span class="net-unit"> ${unit}</span></div>
-    <div class="net-caption">Net impact — burdens minus sequestration &amp; circularity credit${seqNote}</div>
+    <div class="net-caption">Net impact ${modeLabel} — burdens minus sequestration &amp; circularity credit${seqNote}</div>
     <div class="bars">
       ${burdenBar}
       ${barRow("Sequestration", seqVal, "var(--teal)")}
@@ -795,6 +849,14 @@ function renderResults() {
 
   const sel = document.getElementById("category-select");
   if (sel) sel.addEventListener("change", (e) => { state.category = e.target.value; renderResults(); if (state.activeTab === "compare") renderLeft2Sliders(); });
+
+  document.getElementById("results-controls").querySelectorAll("[data-action='set-results-mode']").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.resultsMode = btn.dataset.mode;
+      renderResults();
+      if (state.activeTab === "compare") renderLeft2Sliders();
+    });
+  });
 
   const bgSlider = document.getElementById("background-slider");
   if (bgSlider) bgSlider.addEventListener("input", (e) => {
