@@ -61,6 +61,12 @@ strong{ font-weight:650; }
   text-decoration:none;
 }
 .home-link:hover{ color:var(--accent-soft); }
+.hero-top{ display:flex; justify-content:space-between; align-items:center; gap:10px 16px; flex-wrap:wrap; }
+.page-nav{ display:flex; flex-wrap:wrap; gap:4px; font-family:var(--mono); font-size:12.5px; letter-spacing:.04em; }
+.page-nav a{ color:var(--map-text-soft); text-decoration:none; padding:6px 12px; border-radius:20px; }
+.page-nav a:hover{ color:var(--map-text); background:rgba(255,255,255,.08); }
+.page-nav a[aria-current="page"]{ color:var(--map-bg); background:var(--accent-soft); }
+@media (max-width:640px){ .page-nav{ font-size:11.5px; margin-left:-10px; } .page-nav a{ padding:5px 10px; } }
 .hero-body{ flex:1; display:flex; align-items:center; padding-top:56px; padding-bottom:56px; }
 .hero .eyebrow{ color:var(--accent-soft); }
 .hero h1{

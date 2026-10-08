@@ -280,10 +280,16 @@ function newId(){
   return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
 }
 
-async function submitChoice(evt){
+// The result appears straight away; saving to the Sheet happens in the
+// background (Apps Script can take several seconds to answer).
+let submitting = false;
+
+function submitChoice(evt){
   evt.preventDefault();
+  if(submitting) return;                  // guard against double clicks
   const name = document.getElementById('nameInput').value.trim();
   if(!name) return;
+  submitting = true;
   const reason = document.getElementById('reasonInput').value.trim();
   const [lat,lon] = gridToLatLonApprox(site.col,site.row);
   const entry = {
@@ -297,14 +303,9 @@ async function submitChoice(evt){
   };
   myEntryId = entry.id;
 
-  let saved = true;
-  try{ await Leaderboard.submit(entry); }catch(e){ saved = false; }
-  await refreshBoard();
-  if(!entries.some(e=>e.id===entry.id)){
-    entries.push(normaliseEntry(entry));
-    entries.sort((a,b)=>a.score-b.score || a.ts-b.ts);
-    renderBoard();
-  }
+  entries = mergeEntries(entries, [entry]);
+  setBoardStatus();
+  renderBoard();
   const rank = entries.findIndex(e=>e.id===entry.id)+1;
 
   document.getElementById('resultPct').textContent = Math.floor(entry.pct)+'%';
@@ -312,11 +313,27 @@ async function submitChoice(evt){
     `of all ${(SCORE_DIST.n_feasible/1e6).toFixed(1)} million possible factory locations and travel distances in Europe.`;
   document.getElementById('resultMeta').innerHTML =
     `Leaderboard rank <b>#${rank}</b> of <b>${entries.length}</b><br>` +
-    `Score <b>${entry.score.toFixed(3)}</b> impact points` +
-    (saved ? '' : '<br><span style="color:var(--danger)">Could not reach the leaderboard; your entry is shown on this screen only.</span>');
+    `Score <b>${entry.score.toFixed(3)}</b> impact points`;
+  setSaveStatus(Leaderboard.mode==='local' ? 'Saved on this device.' : 'Saving to the leaderboard…', '');
   document.getElementById('chooseForm').hidden = true;
   document.getElementById('resultView').hidden = false;
   document.getElementById('chooseForm').reset();
+  submitting = false;
+
+  Leaderboard.submit(entry)
+    .then(()=>{
+      if(Leaderboard.mode==='sheet') setSaveStatus('Saved to the leaderboard ✓', 'ok', entry.id);
+      refreshBoard();
+    })
+    .catch(()=>setSaveStatus("Couldn't reach the leaderboard right now. Your entry will be sent the next time this page is opened.", 'warn', entry.id));
+}
+
+// Only update the note if the result on screen is still this entry's.
+function setSaveStatus(text, kind, forId){
+  if(forId && forId!==myEntryId) return;
+  const el = document.getElementById('saveStatus');
+  el.textContent = text;
+  el.className = 'save-status' + (kind ? ' '+kind : '');
 }
 
 /* ============================================================
@@ -326,15 +343,28 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+let boardRequestSeq = 0;
+let boardError = false;
+
+function setBoardStatus(text){
+  const count = `${entries.length} ${entries.length===1?'entry':'entries'}`;
+  document.getElementById('boardStatus').textContent = text ||
+    (Leaderboard.mode==='local' ? `${count} · local mode (this browser only)`
+      : boardError ? `${count} · couldn't refresh just now` : count);
+}
+
 async function refreshBoard(){
-  const status = document.getElementById('boardStatus');
+  const seq = ++boardRequestSeq;
   try{
-    entries = await Leaderboard.list();
-    const count = `${entries.length} ${entries.length===1?'entry':'entries'}`;
-    status.textContent = Leaderboard.mode==='local' ? `${count} · local mode (this browser only)` : count;
+    const list = await Leaderboard.list();
+    if(seq!==boardRequestSeq) return;     // a newer refresh is on its way
+    entries = list;
+    boardError = false;
   }catch(e){
-    status.textContent = 'leaderboard unavailable right now';
+    if(seq!==boardRequestSeq) return;
+    boardError = true;
   }
+  setBoardStatus();
   renderBoard();
 }
 
@@ -408,10 +438,15 @@ function initControls(){
   buildBasemap();
   initControls();
   recompute();
+  // show the last leaderboard seen straight away, then update it
+  entries = Leaderboard.cached();
+  renderBoard();
+  setBoardStatus(entries.length ? undefined : 'loading…');
+  refreshBoard();
+  Leaderboard.flushOutbox().then(()=>refreshBoard()).catch(()=>{});
   await decodeAll();
   document.getElementById('loadingScreen').style.display='none';
   if(new URLSearchParams(location.search).has('selftest')){
     console.log('Self-test', runSelfTest() ? 'PASSED' : 'FAILED');
   }
-  refreshBoard();
 })();

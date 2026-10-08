@@ -42,8 +42,17 @@ function doPost(e) {
     const d = JSON.parse(e.postData.contents);
     const name = clean_(d.name, 30);
     if (!name || num_(d.score) === '') return json_({ ok: false });
-    getSheet_().appendRow([
-      new Date(), clean_(d.id, 64), name, clean_(d.reason, 200),
+    const sheet = getSheet_();
+    const id = clean_(d.id, 64);
+    // The page retries entries it couldn't confirm, so skip ids already saved.
+    if (id && sheet.getLastRow() > 1) {
+      const idCol = HEADERS.indexOf('id') + 1;
+      const found = sheet.getRange(2, idCol, sheet.getLastRow() - 1, 1)
+        .createTextFinder(id).matchEntireCell(true).findNext();
+      if (found) return json_({ ok: true, duplicate: true });
+    }
+    sheet.appendRow([
+      new Date(), id, name, clean_(d.reason, 200),
       num_(d.col), num_(d.row), num_(d.radius_km), num_(d.lat), num_(d.lon),
       num_(d.score), num_(d.pct),
       num_(d.climate_change), num_(d.eutrophication_marine), num_(d.land_use),

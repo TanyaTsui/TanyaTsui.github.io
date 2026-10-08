@@ -56,6 +56,10 @@
     margin:0 0 8px;
   }
   header.top .home-link:hover{ color:var(--accent); }
+  .page-nav{ display:flex; flex-wrap:wrap; gap:4px; margin:0 0 12px -10px; font-family:var(--mono); font-size:11.5px; letter-spacing:.04em; }
+  .page-nav a{ color:var(--ink-soft); text-decoration:none; padding:5px 10px; border-radius:20px; }
+  .page-nav a:hover{ color:var(--accent); background:var(--card); }
+  .page-nav a[aria-current="page"]{ color:var(--accent); background:var(--accent-soft); }
   header.top .eyebrow{
     font-family:var(--mono);
     font-size:11px;
@@ -380,6 +384,9 @@
   .result-line{ font-size:14px; line-height:1.5; margin:0 0 12px; }
   .result-meta{ font-size:12px; color:var(--ink-soft); line-height:1.6; margin:0 0 14px; }
   .result-meta b{ font-family:var(--mono); color:var(--ink); }
+  .save-status{ font-size:12px; color:var(--ink-soft); margin:-6px 0 14px; min-height:1.4em; }
+  .save-status.ok{ color:var(--good); }
+  .save-status.warn{ color:var(--danger); }
 
   .loading-screen{
     position:fixed;inset:0;
@@ -412,7 +419,7 @@
 <div class="app">
   <header class="top">
     <div>
-      <a class="home-link" href="./">← Introduction</a>
+      <nav class="page-nav" aria-label="Exhibition pages"><a href="./">Introduction</a><a href="play.html" aria-current="page">The game</a><a href="explainer.html">How it works</a></nav>
       <p class="eyebrow">RAW Project · Factory siting game</p>
       <h1>Where would you build the factory?</h1>
     </div>
@@ -485,6 +492,7 @@
       <div class="result-big" id="resultPct"></div>
       <p class="result-line" id="resultLine"></p>
       <p class="result-meta" id="resultMeta"></p>
+      <p class="save-status" id="saveStatus"></p>
       <div class="modal-actions">
         <a class="btn ghost" href="explainer.html">How was this calculated?</a>
         <button type="button" class="btn" id="doneBtn">See the leaderboard</button>
