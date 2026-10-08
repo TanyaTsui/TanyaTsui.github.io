@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How the Score Works | Factory Siting Game | Tanya Tsui</title>
+<meta name="description" content="How the factory siting game scores your choice: a simplified cradle-to-gate life cycle assessment of 3D-printed biopolymer, three EF 3.1 impact categories normalised into one score, ecoinvent data and our own European material availability maps.">
+<link rel="canonical" href="https://tanyatsui.github.io/factory-siting/explainer.html">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+
+<!-- ========== 1 · How your score is made ========== -->
+<header class="hero short">
+  <div class="wrap hero-top">
+    <a class="home-link" href="play.html">← Back to the game</a>
+  </div>
+  <div class="wrap hero-body">
+    <div>
+      <p class="eyebrow">RAW project · Factory siting game</p>
+      <h1>How was your score calculated?</h1>
+      <p>Every possible factory location in Europe has a different mix of materials nearby, so each one has a different environmental impact. We worked out that impact for every location and every catchment size, using a method called <strong>life cycle assessment</strong>. Your score shows how your choice compares with all of them.</p>
+      <p class="soft">The next sections explain the method and where the numbers come from.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ========== 2 · Environmental impact modelling ========== -->
+  <section class="block" id="method">
+    <div class="wrap">
+      <p class="eyebrow">The method</p>
+      <h2>Measuring environmental impact with life cycle assessment</h2>
+
+      <h3>What is counted</h3>
+      <p>Life cycle assessment (LCA) adds up the environmental impacts of everything needed to make a product, from the ground up. Here we count the impacts of making <strong>1 kg of 3D-printed biopolymer</strong>:</p>
+      <ol class="steps">
+        <li><strong>Growing or extracting the materials.</strong> Crops need land and fertiliser. Wood and paper residues carry a share of the impact of the industry they came from. Seagrass has to be harvested.</li>
+        <li><strong>Transport.</strong> Trucks carry the materials from the catchment area to the factory. The further away they are, the higher the impact.</li>
+        <li><strong>Making the biopolymer.</strong> Mixing the ingredients, 3D printing, drying and baking. This is the same everywhere in the game.</li>
+      </ol>
+      <p>This kind of study is called <strong>cradle-to-gate</strong>: it follows the material from its origin to the factory gate. It stops there. It does not include how a finished product is used, repaired, or disposed of.</p>
+
+      <h3>Three impact categories</h3>
+      <p>LCA can measure many types of environmental impact. The European method we use, the <strong>Environmental Footprint (EF 3.1)</strong> <a class="cite" href="#references">(European Commission, 2021; Andreasi Bassi et al., 2023)</a>, defines 16 of them, including acidification, ozone depletion and water use. To keep the game clear, we picked three:</p>
+      <ul class="cat-defs">
+        <li><span class="dot" style="background:var(--cat-climate)"></span><span><strong>Climate change:</strong> greenhouse gases, measured in kg CO₂-equivalent.</span></li>
+        <li><span class="dot" style="background:var(--cat-eutro)"></span><span><strong>Marine eutrophication:</strong> nutrients such as nitrogen washing into the sea, where they cause algal blooms and oxygen-poor water. Measured in kg nitrogen-equivalent.</span></li>
+        <li><span class="dot" style="background:var(--cat-land)"></span><span><strong>Land use:</strong> how much farming and forestry reduce the quality of the soil, measured with a soil quality index.</span></li>
+      </ul>
+
+      <h3>Turning three numbers into one score</h3>
+      <p>The three categories use different units, so they can't be added directly. We use the EF 3.1 <strong>normalisation factors</strong> to make them comparable <a class="cite" href="#references">(Andreasi Bassi et al., 2023)</a>.</p>
+      <p>A normalisation factor is the total yearly impact of an average European in that category. Dividing your impact by it tells you how large your impact is <strong>compared with one person's yearly footprint</strong>:</p>
+      <table class="norm-table">
+        <thead><tr><th>Category</th><th>Average European, per year</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:var(--cat-climate)"></span>Climate change</td><td class="num">7,553 kg CO₂-eq</td></tr>
+          <tr><td><span class="dot" style="background:var(--cat-eutro)"></span>Marine eutrophication</td><td class="num">19.5 kg N-eq</td></tr>
+          <tr><td><span class="dot" style="background:var(--cat-land)"></span>Land use</td><td class="num">819,500 soil-quality points</td></tr>
+        </tbody>
+      </table>
+      <p>For example, 1 kg CO₂-eq is 1/7,553 of an average European's yearly climate footprint. After normalising, the three categories are on the same scale. We then add them with equal weight and multiply by 1,000. The unit is <strong>impact points</strong>: one point is a thousandth of an average European's yearly footprint.</p>
+      <p><strong>Lower is better.</strong> Your percentile shows what share of all possible location and catchment combinations scored worse than yours.</p>
+
+      <h3>Benefits: stored carbon</h3>
+      <p>Not everything in an LCA is a burden. Plants take CO₂ from the air as they grow. When that carbon ends up in a long-lasting product, it stays out of the atmosphere for as long as the product lasts. This can count as a <strong>benefit</strong>: a credit that lowers the climate change score.</p>
+      <p>We use an LCA accounting method that credits the carbon sequestration of bio-based products, developed by <a class="cite" href="#references">Guest et al. (2013)</a>. It takes two things into account:</p>
+      <ul class="plain">
+        <li><strong>Rotation period:</strong> how long the plant takes to grow back and take the carbon up again. Crops regrow within a year. Forests take decades.</li>
+        <li><strong>Storage period:</strong> how long the carbon stays locked in the product before it returns to the air. In the game, we assume 25 years.</li>
+      </ul>
+      <p>Fast-growing materials, such as cotton, hemp and peas, earn a credit. So do waste materials such as cellulose and seagrass, because their carbon is released 25 years later than it otherwise would be. Materials from slow-growing forests, such as bark and wood flour, get a small <strong>penalty</strong> instead: 25 years of storage doesn't make up for the decades the forest needs to grow back.</p>
+      <p>In the game, these credits and penalties are weighted by how much of each material is in your factory's mix, and they show up as the "Avoided" bar.</p>
+      <p>Want to know more? See the <a href="https://tanyatsui.github.io/carbon-sequestration-explainer/" target="_blank" rel="noopener">carbon sequestration accounting explainer</a>.</p>
+      <p class="note">This is a simplified estimate, not a full LCA.</p>
+    </div>
+  </section>
+
+  <!-- ========== 3 · Where the data comes from ========== -->
+  <section class="block" id="data">
+    <div class="wrap">
+      <p class="eyebrow">The data</p>
+      <h2>Where the numbers come from</h2>
+
+      <h3>Impacts: ecoinvent</h3>
+      <p>Most of the impact data comes from <strong>ecoinvent</strong>, the world's most widely used database of life cycle inventories. It contains thousands of industrial and agricultural processes, each with its inputs, emissions and resource use. We used version 3.12 <a class="cite" href="#references">(ecoinvent, 2025; Wernet et al., 2016)</a>.</p>
+      <p>For each material, we used the closest match:</p>
+      <table class="norm-table src-table">
+        <thead><tr><th>Material</th><th>Impact data</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:var(--bark)"></span>Bark</td><td>ecoinvent: bark chips. The milling step that turns chips into flour is not yet included.</td></tr>
+          <tr><td><span class="dot" style="background:var(--sawdust)"></span>Wood flour</td><td>ecoinvent: sawdust from wood processing</td></tr>
+          <tr><td><span class="dot" style="background:var(--cellulose)"></span>Cellulose</td><td>ecoinvent: cellulose fibre</td></tr>
+          <tr><td><span class="dot" style="background:var(--hempdust)"></span>Hemp dust</td><td>ecoinvent: hemp carding waste, a by-product of hemp fibre processing</td></tr>
+          <tr><td><span class="dot" style="background:var(--cotton)"></span>Cotton</td><td>ecoinvent: seed-cotton (raw, unprocessed cotton)</td></tr>
+          <tr><td><span class="dot" style="background:var(--peas)"></span>Pea protein</td><td>Our own inventory, based on a RAW project workshop, using ecoinvent for background processes</td></tr>
+          <tr><td><span class="dot" style="background:var(--seagrass)"></span>Seagrass</td><td>A life cycle assessment by a RAW project partner</td></tr>
+        </tbody>
+      </table>
+      <p>Learn more: <a href="https://ecoinvent.org" target="_blank" rel="noopener">ecoinvent.org</a></p>
+      <p>The impacts are calculated with the EF 3.1 method. More about it: <a href="https://eplca.jrc.ec.europa.eu/EnvironmentalFootprint.html" target="_blank" rel="noopener">Environmental Footprint (European Commission)</a></p>
+
+      <h3>Material availability: our own maps</h3>
+      <p>Ecoinvent tells us how much each material costs the environment. It doesn't tell us <strong>where</strong> the material is available. There was no ready-made map of that, so we built one.</p>
+      <p>For each of the seven materials we estimated how many tonnes are produced each year in each 10 × 10 km square of Europe. Each kind of material needed its own approach:</p>
+      <ul class="cat-defs">
+        <li><span class="dot" style="background:var(--peas)"></span><span><strong>Crops (peas, cotton, hemp dust).</strong> National and regional harvest statistics from Eurostat, spread over the places where each crop is grown using the SPAM crop maps <a class="cite" href="#references">(Eurostat, 2025a; IFPRI, 2024)</a>. Hemp dust is a by-product of processing hemp fibre: about 5% of the hemp harvest <a class="cite" href="#references">(Zampori et al., 2013)</a>.</span></li>
+        <li><span class="dot" style="background:var(--sawdust)"></span><span><strong>Forest residues (bark, wood flour).</strong> The amount of residue from sawmills and other wood industries, estimated by the S2BIOM project, spread over Europe's forests using the EFI forest map <a class="cite" href="#references">(S2BIOM, n.d.; European Forest Institute, n.d.)</a>. For countries S2BIOM doesn't cover, such as Norway and Switzerland, we used yield estimates from the literature.</span></li>
+        <li><span class="dot" style="background:var(--cellulose)"></span><span><strong>Cellulose.</strong> Fibres rejected by paper mills, estimated from paper production statistics and the locations of paper mills <a class="cite" href="#references">(Eurostat, 2025b; Spatial Finance Initiative, 2025)</a>.</span></li>
+        <li><span class="dot" style="background:var(--seagrass)"></span><span><strong>Seagrass.</strong> Maps of seagrass meadows, combined with measurements of how fast seagrass grows and an estimate of how much of it washes out of the meadows <a class="cite" href="#references">(EMODnet Seabed Habitats, 2025; Strydom et al., 2023; Cebrián &amp; Duarte, 2001)</a>.</span></li>
+      </ul>
+
+      <figure class="tour">
+        <!-- assets/europe_tour.gif; if it fails to load, the placeholder box shows instead. -->
+        <a href="assets/europe_tour.gif" target="_blank" rel="noopener" title="Open full size"><img src="assets/europe_tour.gif" width="2200" height="1100" loading="lazy" alt="Animated maps of Europe showing, for several locations, how much of each of the seven materials is available within 500 km" onerror="this.closest('figure').classList.add('missing'); this.remove();"></a>
+        <div class="tour-placeholder" aria-hidden="true">Animation coming soon</div>
+        <figcaption>A tour of Europe: the materials available within 500 km of different locations. Darker means more tonnes per year.</figcaption>
+      </figure>
+
+      <p>When you choose a location and a catchment area, the game adds up everything inside the circle and works out the mix of materials your factory could use.</p>
+
+      <h3>Simplifications</h3>
+      <ul class="plain">
+        <li>Materials travel in a straight line to the factory, plus 30% to account for real roads.</li>
+        <li>Every factory uses the same equipment and the same process everywhere.</li>
+        <li>The factory needs at least 50,000 tonnes of materials per year within its catchment.</li>
+      </ul>
+
+      <div class="start-row row">
+        <a class="start" href="play.html">Play again <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="index.html">Back to the start</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== References ========== -->
+  <section class="block refs" id="references">
+    <div class="wrap">
+      <h3>References</h3>
+      <ul class="ref-list">
+        <li>Andreasi Bassi, S., Biganzoli, F., Ferrara, N., Amadei, A., Valente, A., Sala, S., &amp; Ardente, F. (2023). <em>Updated characterisation and normalisation factors for the Environmental Footprint 3.1 method</em> (EUR 31414 EN). Publications Office of the European Union. <a href="https://doi.org/10.2760/798894" target="_blank" rel="noopener">doi:10.2760/798894</a></li>
+        <li>Cebrián, J., &amp; Duarte, C. M. (2001). Detrital stocks and dynamics of the seagrass <em>Posidonia oceanica</em> (L.) Delile in the Spanish Mediterranean. <em>Aquatic Botany</em>, 70(4), 295–309. <a href="https://doi.org/10.1016/S0304-3770(01)00154-1" target="_blank" rel="noopener">doi:10.1016/S0304-3770(01)00154-1</a></li>
+        <li>ecoinvent. (2025). <em>ecoinvent database, version 3.12</em>. ecoinvent Association, Zurich. <a href="https://ecoinvent.org" target="_blank" rel="noopener">ecoinvent.org</a></li>
+        <li>EMODnet Seabed Habitats. (2025). <em>Seagrass cover in Europe</em> [Dataset]. <a href="https://gis.ices.dk/geonetwork/srv/api/records/39746d9c-4220-425c-bc26-7cb3056c36a5" target="_blank" rel="noopener">gis.ices.dk</a></li>
+        <li>European Commission. (2021). Commission Recommendation (EU) 2021/2279 of 15 December 2021 on the use of the Environmental Footprint methods to measure and communicate the life cycle environmental performance of products and organisations. <em>Official Journal of the European Union</em>, L 471, 1–396. <a href="https://eur-lex.europa.eu/eli/reco/2021/2279/oj" target="_blank" rel="noopener">eur-lex.europa.eu/eli/reco/2021/2279/oj</a></li>
+        <li>European Forest Institute. (n.d.). <em>Forest map of Europe</em> [Dataset]. <a href="https://efi.int/knowledge/maps/forest" target="_blank" rel="noopener">efi.int/knowledge/maps/forest</a></li>
+        <li>Eurostat. (2025a). <em>Crop production in EU standard humidity</em> (apro_cpsh1) [Dataset]. <a href="https://ec.europa.eu/eurostat/databrowser/view/apro_cpsh1/default/table" target="_blank" rel="noopener">ec.europa.eu/eurostat</a></li>
+        <li>Eurostat. (2025b). <em>Paper and paperboard production statistics</em> (for_pp) [Dataset]. <a href="https://ec.europa.eu/eurostat/databrowser/view/for_pp/default/table" target="_blank" rel="noopener">ec.europa.eu/eurostat</a></li>
+        <li>Guest, G., Cherubini, F., &amp; Strømman, A. H. (2013). Global warming potential of carbon dioxide emissions from biomass stored in the anthroposphere and used for bioenergy at end of life. <em>Journal of Industrial Ecology</em>, 17(1), 20–30. <a href="https://doi.org/10.1111/j.1530-9290.2012.00507.x" target="_blank" rel="noopener">doi:10.1111/j.1530-9290.2012.00507.x</a></li>
+        <li>International Food Policy Research Institute (IFPRI). (2024). <em>Global spatially-disaggregated crop production statistics data for 2020, version 2.0</em> (SPAM 2020) [Dataset]. <a href="https://www.mapspam.info/data/" target="_blank" rel="noopener">mapspam.info</a></li>
+        <li>S2BIOM. (n.d.). <em>Biomass cost-supply data</em> [Dataset]. <a href="https://s2biom.wenr.wur.nl/web/guest/data-downloads" target="_blank" rel="noopener">s2biom.wenr.wur.nl</a></li>
+        <li>Spatial Finance Initiative. (2025). <em>GeoAsset pulp and paper database</em> [Dataset]. <a href="https://cgfi.ac.uk/spatial-finance-initiative/geoasset-project/pulp-and-paper-database/" target="_blank" rel="noopener">cgfi.ac.uk</a></li>
+        <li>Strydom, S., McCallum, R., Lafratta, A., Webster, C. L., O'Dea, C. M., Said, N. E., … Serrano, O. (2023). Global dataset on seagrass meadow structure, biomass and production. <em>Earth System Science Data</em>, 15(1), 511–519. <a href="https://doi.org/10.5194/essd-15-511-2023" target="_blank" rel="noopener">doi:10.5194/essd-15-511-2023</a></li>
+        <li>Wernet, G., Bauer, C., Steubing, B., Reinhard, J., Moreno-Ruiz, E., &amp; Weidema, B. (2016). The ecoinvent database version 3 (part I): overview and methodology. <em>The International Journal of Life Cycle Assessment</em>, 21(9), 1218–1230. <a href="https://doi.org/10.1007/s11367-016-1087-8" target="_blank" rel="noopener">doi:10.1007/s11367-016-1087-8</a></li>
+        <li>Zampori, L., Dotelli, G., &amp; Vernelli, V. (2013). Life cycle assessment of hemp cultivation and use of hemp-based thermal insulator materials in buildings. <em>Environmental Science &amp; Technology</em>, 47(13), 7413–7420. <a href="https://doi.org/10.1021/es401326a" target="_blank" rel="noopener">doi:10.1021/es401326a</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">RAW project · <a href="../">Tanya Tsui</a></div>
+</footer>
+
+<!-- Review mode (?review): highlights passages that still need fixing. -->
+<aside class="review-panel" id="reviewPanel" hidden>
+  <button type="button" class="review-toggle" id="reviewToggle" aria-expanded="true">Review: fixes</button>
+  <ol id="reviewList"></ol>
+</aside>
+<script>
+// One-line description of each open fix. Passages are marked with data-fix="n"
+// in the HTML above; delete the marker (and the entry here) once a fix is resolved.
+// Full details: content/explainer.md, "Fixes needed".
+const FIXES = {
+};
+
+if (new URLSearchParams(location.search).has('review')) {
+  document.body.classList.add('review');
+  const panel = document.getElementById('reviewPanel');
+  const list = document.getElementById('reviewList');
+  document.querySelectorAll('[data-fix]').forEach(el => {
+    const n = el.dataset.fix;
+    el.id = 'fix-' + n;
+    el.title = 'FIX ' + n + ': ' + (FIXES[n] || '');
+  });
+  Object.entries(FIXES).forEach(([n, text]) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#fix-' + n;
+    a.innerHTML = '<b>FIX ' + n + '</b> ';
+    a.appendChild(document.createTextNode(text));
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+  const nFix = Object.keys(FIXES).length;
+  document.getElementById('reviewToggle').textContent = nFix ? 'Review: ' + nFix + ' fix' + (nFix === 1 ? '' : 'es') : 'Review: no open fixes';
+  document.getElementById('reviewToggle').addEventListener('click', e => {
+    const open = panel.classList.toggle('collapsed') === false;
+    e.currentTarget.setAttribute('aria-expanded', open);
+  });
+  panel.hidden = false;
+}
+</script>
+</body>
+</html>
