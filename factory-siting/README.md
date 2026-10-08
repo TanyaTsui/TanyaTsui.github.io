@@ -79,7 +79,7 @@ The browser's own full-screen mode stays on when visitors move between the three
 - **Quick full screen:** F11 (Windows) or Ctrl+Cmd+F (macOS) in Chrome.
 - **Tablet:** the site is installable (`manifest.webmanifest`, `display: fullscreen`). iPad: Safari → Share → Add to Home Screen, then open it from the home screen (no browser bars); add Guided Access (Settings → Accessibility) to lock the tablet to it. Android: Chrome → menu → Install app.
 
-Links that leave the exhibition (the "Tanya Tsui" link, ecoinvent and reference links) open outside the installed app.
+**Exhibition mode** (`kiosk.js`): when the site runs full screen, links that would leave the exhibition are hidden (the "Tanya Tsui" link, the footer) or turned into plain text (ecoinvent, EF and reference links, the GIF's full-size link). Only the Introduction / The game / How it works navigation stays clickable. It switches on automatically when the page fills the whole screen (F11, `--kiosk`, installed app, or macOS full screen with View → "Always Show Toolbar in Full Screen" unticked). To force it on for a machine regardless, open `https://tanyatsui.github.io/factory-siting/?kiosk` once (remembered in that browser); `?kiosk=off` undoes it.
 
 ## Not built yet
 

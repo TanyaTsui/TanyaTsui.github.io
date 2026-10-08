@@ -6,6 +6,7 @@
 <title>Factory Siting Game | RAW Project | Tanya Tsui</title>
 <meta name="description" content="Interactive map of Europe: site a 3D-printing factory for bio-based construction products, set how far feedstock may travel, and see how your choice ranks against every possible location on its feedstock, transport and fabrication impacts. Built by Tanya Tsui for the RAW project.">
 <link rel="canonical" href="https://tanyatsui.github.io/factory-siting/play.html">
+<script src="kiosk.js"></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -420,6 +421,12 @@
   @keyframes load{
     0%{transform:translateX(-100%);}
     100%{transform:translateX(430%);}
+  }
+  /* ---------- exhibition (kiosk) mode, set by kiosk.js: nothing leaves the exhibition ---------- */
+  .kiosk .home-link, .kiosk footer{ display:none; }
+  .kiosk .page-nav{ margin-left:auto; }
+  .kiosk a[href^="http"], .kiosk a[href^="../"], .kiosk a[target="_blank"]{
+    pointer-events:none; cursor:default; color:inherit; text-decoration:none;
   }
 </style>
 </head>
