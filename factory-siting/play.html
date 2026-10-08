@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Factory Siting Game | RAW Project | Tanya Tsui</title>
 <meta name="description" content="Interactive map of Europe: site a 3D-printing factory for bio-based construction products, set how far feedstock may travel, and see how your choice ranks against every possible location on its feedstock, transport and fabrication impacts. Built by Tanya Tsui for the RAW project.">
 <link rel="canonical" href="https://tanyatsui.github.io/factory-siting/play.html">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#182720">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Factory siting">
 <style>
   :root{
     --paper:#F2EEE4;
@@ -41,7 +49,7 @@
   }
   /* ---------- header: same dark band as the welcome page and explainer ---------- */
   .hero{ background:var(--map-bg); color:var(--map-text); }
-  .hero-inner{ max-width:1320px; margin:0 auto; padding:20px 24px 26px; }
+  .hero-inner{ max-width:1320px; margin:0 auto; padding:max(20px, env(safe-area-inset-top)) 24px 26px; }
   .hero-top{ display:flex; justify-content:space-between; align-items:center; gap:10px 16px; flex-wrap:wrap; }
   .home-link{ font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--map-text-soft); text-decoration:none; }
   .home-link:hover{ color:var(--accent-soft); }
@@ -78,7 +86,7 @@
   }
   @media (max-width:640px){
     .app{padding:20px 16px 40px;}
-    .hero-inner{ padding:16px 16px 22px; }
+    .hero-inner{ padding:max(16px, env(safe-area-inset-top)) 16px 22px; }
     .page-nav{ font-size:11.5px; margin-left:-10px; }
     .page-nav a{ padding:5px 10px; }
   }

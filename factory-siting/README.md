@@ -69,6 +69,18 @@ Notes:
 - If you redeploy the script as a *new deployment*, the URL changes. Use "Manage deployments → Edit" to keep the same URL.
 - While `LEADERBOARD_URL` is empty, the page runs in **local mode**: entries are kept in this browser only. This is useful for testing, or for a single offline kiosk.
 
+## Exhibition setup (full screen)
+
+The browser's own full-screen mode stays on when visitors move between the three pages; a page's "full screen" button would not (it switches off on every page change), so there isn't one.
+
+- **Laptop/PC kiosk (recommended):** start Chrome in kiosk mode, which hides all browser UI and can't be exited with a click:
+  - macOS: `open -na "Google Chrome" --args --kiosk "https://tanyatsui.github.io/factory-siting/"` (quit with Cmd+Q)
+  - Windows: `chrome.exe --kiosk https://tanyatsui.github.io/factory-siting/` (quit with Alt+F4)
+- **Quick full screen:** F11 (Windows) or Ctrl+Cmd+F (macOS) in Chrome.
+- **Tablet:** the site is installable (`manifest.webmanifest`, `display: fullscreen`). iPad: Safari → Share → Add to Home Screen, then open it from the home screen (no browser bars); add Guided Access (Settings → Accessibility) to lock the tablet to it. Android: Chrome → menu → Install app.
+
+Links that leave the exhibition (the "Tanya Tsui" link, ecoinvent and reference links) open outside the installed app.
+
 ## Not built yet
 
 - Kiosk idle reset

@@ -21,7 +21,7 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth; background:var(--map-bg);} /* overscroll above the page stays dark green */
 body{
   background:var(--paper);
   color:var(--ink);
@@ -47,12 +47,14 @@ strong{ font-weight:650; }
   background:var(--map-bg);
   color:var(--map-text);
   min-height:100vh;
-  min-height:100svh;
+  /* dynamic viewport height: follows mobile browser bars, so no strip of the
+     next section ever shows below the first screen */
+  min-height:100dvh;
   display:flex;
   flex-direction:column;
 }
 .hero > .wrap{ width:100%; }
-.hero-top{ padding-top:24px; }
+.hero-top{ padding-top:max(24px, env(safe-area-inset-top)); } /* clear the status bar when installed full screen */
 .home-link{
   font-family:var(--mono);
   font-size:12px;
@@ -214,8 +216,6 @@ footer a{ color:inherit; }
    ====================================================== */
 main a{ color:var(--accent); text-underline-offset:3px; }
 .note a{ color:var(--accent); }
-.hero.short{ min-height:auto; }
-.hero.short .hero-body{ padding-top:64px; padding-bottom:88px; }
 h3{
   font-size:clamp(23px, 2.4vw, 28px);
   line-height:1.2;
